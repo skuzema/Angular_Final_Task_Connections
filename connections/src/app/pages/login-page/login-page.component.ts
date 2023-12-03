@@ -14,6 +14,9 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { Router } from "@angular/router";
 
+import { DataService } from "../../core/services/data.service";
+import { LoginData } from "../../shared/models/data";
+
 @Component({
     selector: "app-login-page",
     standalone: true,
@@ -40,7 +43,11 @@ export class LoginPageComponent {
         password: this.password,
     });
 
-    constructor(private _formBuilder: FormBuilder, private router: Router) {}
+    constructor(
+        private _formBuilder: FormBuilder,
+        private router: Router,
+        private dataService: DataService
+    ) {}
 
     getEmailErrorMessage() {
         if (this.email.hasError("required")) {
@@ -60,6 +67,14 @@ export class LoginPageComponent {
     }
 
     onSubmit() {
-        console.log("On Submit:", this.email.value);
+        console.log("On Submit Login:", this.loginForm.value);
+        const loginData: LoginData = {
+            email: this.loginForm.value.email!,
+            password: this.loginForm.value.password!,
+        };
+
+        this.dataService.login(loginData).subscribe(() => {
+            this.router.navigate(["/main"]);
+        });
     }
 }

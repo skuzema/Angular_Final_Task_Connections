@@ -8,3 +8,13 @@ export interface RegistrationData {
     name: string;
     password: string;
 }
+
+export interface LoginData {
+    email: string;
+    password: string;
+}
+
+export interface LoginResponseData {
+    token: string;
+    uid: string;
+}

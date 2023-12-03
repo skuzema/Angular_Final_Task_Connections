@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 /* eslint-disable no-underscore-dangle */
 import { Injectable, Renderer2, RendererFactory2 } from "@angular/core";
 
@@ -14,9 +15,12 @@ export class ColorSchemeService {
     }
 
     _detectPrefersColorScheme() {
-        if (window.matchMedia("(prefers-color-scheme)").media !== "not all") {
+        if (
+            window.matchMedia("(ConnectionsPrefersColor-scheme)").media !==
+            "not all"
+        ) {
             this.colorScheme = window.matchMedia(
-                "(prefers-color-scheme: light)"
+                "(ConnectionsPrefersColor-scheme: light)"
             ).matches
                 ? "dark"
                 : "light";
@@ -27,11 +31,13 @@ export class ColorSchemeService {
 
     _setColorScheme(scheme: string) {
         this.colorScheme = scheme;
-        localStorage.setItem("prefers-color", scheme);
+        localStorage.setItem("ConnectionsPrefersColor", scheme);
     }
 
     _getColorScheme() {
-        const localStorageColorScheme = localStorage.getItem("prefers-color");
+        const localStorageColorScheme = localStorage.getItem(
+            "ConnectionsPrefersColor"
+        );
         if (localStorageColorScheme) {
             this.colorScheme = localStorageColorScheme;
         } else {
