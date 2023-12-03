@@ -61,7 +61,7 @@ $dark-theme: mat.define-dark-theme(
   @include mat.toolbar-color($light-theme);
   @include mat.card-color($light-theme);
   .header-container, main {
-    background: #fff;
+    background: #ede7e7;
     color: black;
   }
 }
