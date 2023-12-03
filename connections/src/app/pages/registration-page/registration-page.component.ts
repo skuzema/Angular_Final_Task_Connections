@@ -17,6 +17,9 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { Router } from "@angular/router";
 
+import { DataService } from "../../core/services/data.service";
+import { RegistrationData } from "../../shared/models/data";
+
 @Component({
     selector: "app-registration-page",
     standalone: true,
@@ -48,7 +51,11 @@ export class RegistrationPageComponent {
         password: this.password,
     });
 
-    constructor(private _formBuilder: FormBuilder, private router: Router) {}
+    constructor(
+        private _formBuilder: FormBuilder,
+        private router: Router,
+        private dataService: DataService
+    ) {}
 
     getNameErrorMessage() {
         if (this.name.hasError("required")) {
@@ -104,6 +111,15 @@ export class RegistrationPageComponent {
     }
 
     onSubmit() {
-        console.log("On Submit:", this.email.value);
+        console.log("On Submit:", this.registrationForm.value);
+        const registrationData: RegistrationData = {
+            name: this.registrationForm.value.name!,
+            email: this.registrationForm.value.email!,
+            password: this.registrationForm.value.password!,
+        };
+
+        this.dataService.addUser(registrationData).subscribe(() => {
+            this.router.navigate(["/signin"]);
+        });
     }
 }
