@@ -4,6 +4,7 @@
     "projects/**/*"
   ],
   "plugins": [
+    "@stylistic/js",
     "unused-imports",
     "simple-import-sort"
   ],
