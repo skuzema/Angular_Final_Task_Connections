@@ -3,6 +3,7 @@ import { Component } from "@angular/core";
 import { RouterOutlet } from "@angular/router";
 
 import { HeaderComponent } from "./core/components/header/header.component";
+import { ColorSchemeService } from "./core/services/color-scheme.service";
 import { MainPageComponent } from "./pages/main-page/main-page.component";
 
 @Component({
@@ -14,4 +15,7 @@ import { MainPageComponent } from "./pages/main-page/main-page.component";
 })
 export class AppComponent {
     title = "connections";
+    constructor(private colorSchemeService: ColorSchemeService) {
+        this.colorSchemeService.load();
+    }
 }

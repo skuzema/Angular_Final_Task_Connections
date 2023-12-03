@@ -5,6 +5,8 @@
         "contant",
         "devkit",
         "dribbble",
-        "ngrx"
+        "linebreak",
+        "ngrx",
+        "sidenav"
     ]
 }
