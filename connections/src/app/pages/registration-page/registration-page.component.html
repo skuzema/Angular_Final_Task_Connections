@@ -13,9 +13,9 @@
             </mat-form-field>
             <mat-form-field>
                 <mat-label>Email</mat-label>
-                <input matInput placeholder="test@example.com" [formControl]="email" required>
+                <input matInput placeholder="test@example.com" [formControl]="email" required (input)="onFieldChange()">
                 @if (email.invalid) {
-                  <mat-error>{{getEmailErrorMessage()}}</mat-error>
+                  <mat-error>{{ getEmailErrorMessage() }}</mat-error>
                 }
             </mat-form-field>
             <mat-form-field>
@@ -31,7 +31,8 @@
         </mat-card-content>
         <mat-card-actions align="end">
             <button class="main-btn" mat-stroked-button color="accent" (click)="onLogin()">Login</button>
-            <button class="main-btn" mat-raised-button color="primary" (click)="onSubmit()" [disabled]="registrationForm.invalid">Submit</button>
+            <button class="main-btn" mat-raised-button color="primary" (click)="onSubmit()"
+                    [disabled]="registrationForm.invalid || isDuplicationError || isLoading">Submit</button>
         </mat-card-actions>
     </mat-card>
 </div>

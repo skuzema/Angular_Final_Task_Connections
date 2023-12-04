@@ -39,13 +39,20 @@ import { RegistrationData, SnackType } from "../../shared/models/data";
     styleUrl: "./registration-page.component.scss",
 })
 export class RegistrationPageComponent {
+    hide = true;
+    isDuplicationError = false;
+    isLoading = false;
+
     name = new FormControl("", [Validators.required, this.nameValidator]);
-    email = new FormControl("", [Validators.required, Validators.email]);
+    email = new FormControl("", [
+        Validators.required,
+        Validators.email,
+        this.emailValidator,
+    ]);
     password = new FormControl("", [
         Validators.required,
         this.passwordStrengthValidator,
     ]);
-    hide = true;
 
     registrationForm = this._formBuilder.group({
         name: this.name,
@@ -77,6 +84,9 @@ export class RegistrationPageComponent {
         if (this.email.hasError("email")) {
             return "Not a valid email";
         }
+        if (this.email.hasError("duplicationError")) {
+            return "Email address already taken";
+        }
         return "";
     }
 
@@ -88,6 +98,18 @@ export class RegistrationPageComponent {
             return "Min 8 symbols, include at least 1 capital letter, at least 1 digit and at least 1 special symbol";
         }
         return "";
+    }
+
+    private emailValidator(
+        control: AbstractControl
+    ): { [key: string]: boolean } | null {
+        const enteredEmail = control.value as string;
+        const duplications = JSON.parse(
+            localStorage.getItem("ConnectionsDuplications") || "[]"
+        ) as string[];
+        const isDuplicated = duplications.includes(enteredEmail);
+
+        return isDuplicated ? { duplicationError: true } : null;
     }
 
     private nameValidator(
@@ -114,6 +136,8 @@ export class RegistrationPageComponent {
     }
 
     onSubmit() {
+        this.isLoading = true;
+
         const registrationData: RegistrationData = {
             name: this.registrationForm.value.name!,
             email: this.registrationForm.value.email!,
@@ -121,6 +145,7 @@ export class RegistrationPageComponent {
         };
         this.dataService.addUser(registrationData).subscribe(
             () => {
+                this.isLoading = false;
                 this.snackBar.showSnackbar(
                     "Registration successful",
                     SnackType.success
@@ -128,10 +153,22 @@ export class RegistrationPageComponent {
                 this.router.navigate(["/signin"]);
             },
             (error) => {
+                this.isLoading = false;
                 if (
                     error.status === 400 &&
                     error.error.type === "PrimaryDuplicationException"
                 ) {
+                    this.isDuplicationError = true;
+
+                    const duplications = JSON.parse(
+                        localStorage.getItem("ConnectionsDuplications") || "[]"
+                    ) as string[];
+                    duplications.push(registrationData.email);
+                    localStorage.setItem(
+                        "ConnectionsDuplications",
+                        JSON.stringify(duplications)
+                    );
+
                     this.snackBar.showSnackbar(
                         error.error.message,
                         SnackType.error
@@ -144,6 +181,10 @@ export class RegistrationPageComponent {
                 }
             }
         );
+    }
+
+    onFieldChange() {
+        this.isDuplicationError = false;
     }
 
     onLogin() {
