@@ -77,4 +77,8 @@ export class LoginPageComponent {
             this.router.navigate(["/main"]);
         });
     }
+
+    onSignUp() {
+        this.router.navigate(["/signup"]);
+    }
 }

@@ -17,8 +17,9 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { Router } from "@angular/router";
 
+import { SnackbarComponent } from "../../core/components/snackbar/snackbar.component";
 import { DataService } from "../../core/services/data.service";
-import { RegistrationData } from "../../shared/models/data";
+import { RegistrationData, SnackType } from "../../shared/models/data";
 
 @Component({
     selector: "app-registration-page",
@@ -33,6 +34,7 @@ import { RegistrationData } from "../../shared/models/data";
         MatInputModule,
         MatIconModule,
     ],
+    providers: [SnackbarComponent],
     templateUrl: "./registration-page.component.html",
     styleUrl: "./registration-page.component.scss",
 })
@@ -54,7 +56,8 @@ export class RegistrationPageComponent {
     constructor(
         private _formBuilder: FormBuilder,
         private router: Router,
-        private dataService: DataService
+        private dataService: DataService,
+        public snackBar: SnackbarComponent
     ) {}
 
     getNameErrorMessage() {
@@ -111,15 +114,39 @@ export class RegistrationPageComponent {
     }
 
     onSubmit() {
-        console.log("On Submit:", this.registrationForm.value);
         const registrationData: RegistrationData = {
             name: this.registrationForm.value.name!,
             email: this.registrationForm.value.email!,
             password: this.registrationForm.value.password!,
         };
+        this.dataService.addUser(registrationData).subscribe(
+            () => {
+                this.snackBar.showSnackbar(
+                    "Registration successful",
+                    SnackType.success
+                );
+                this.router.navigate(["/signin"]);
+            },
+            (error) => {
+                if (
+                    error.status === 400 &&
+                    error.error.type === "PrimaryDuplicationException"
+                ) {
+                    this.snackBar.showSnackbar(
+                        error.error.message,
+                        SnackType.error
+                    );
+                } else {
+                    this.snackBar.showSnackbar(
+                        error.error.message,
+                        SnackType.error
+                    );
+                }
+            }
+        );
+    }
 
-        this.dataService.addUser(registrationData).subscribe(() => {
-            this.router.navigate(["/signin"]);
-        });
+    onLogin() {
+        this.router.navigate(["/signin"]);
     }
 }

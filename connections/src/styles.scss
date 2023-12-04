@@ -50,6 +50,20 @@ $dark-theme: mat.define-dark-theme(
     background: #303030;
     color: white;
   }
+  .mat-mdc-snack-bar-container {
+    &.red-style {
+      --mdc-snackbar-container-color: red;
+      --mat-mdc-snack-bar-button-color: #fff;
+      --mdc-snackbar-supporting-text-color: #fff;
+      --mat-snack-bar-button-color: yellow;
+    }
+    &.green-style {
+        --mdc-snackbar-container-color: green;
+        --mat-mdc-snack-bar-button-color: #fff;
+        --mdc-snackbar-supporting-text-color: #fff;
+        --mat-snack-bar-button-color: yellow;
+    }
+  }
 }
 
 .color-scheme-light {
@@ -63,5 +77,19 @@ $dark-theme: mat.define-dark-theme(
   .header-container, main {
     background: #ede7e7;
     color: black;
+  }
+  .mat-mdc-snack-bar-container {
+    &.red-style {
+      --mdc-snackbar-container-color: red;
+      --mat-mdc-snack-bar-button-color: #fff;
+      --mdc-snackbar-supporting-text-color: #fff;
+      --mat-snack-bar-button-color: yellow;
+    }
+    &.green-style {
+        --mdc-snackbar-container-color: green;
+        --mat-mdc-snack-bar-button-color: #fff;
+        --mdc-snackbar-supporting-text-color: #fff;
+        --mat-snack-bar-button-color: yellow;
+    }
   }
 }

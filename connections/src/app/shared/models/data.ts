@@ -18,3 +18,8 @@ export interface LoginResponseData {
     token: string;
     uid: string;
 }
+
+export enum SnackType {
+    error = "error",
+    success = "success",
+}
