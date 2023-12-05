@@ -8,6 +8,7 @@ import { provideStore } from "@ngrx/store";
 import { provideStoreDevtools } from "@ngrx/store-devtools";
 
 import { routes } from "./app.routes";
+import { duplicatedEmailsReducer } from "./redux/reducers/duplicated-emails.reducer";
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -18,5 +19,6 @@ export const appConfig: ApplicationConfig = {
         provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
         provideAnimations(),
         provideHttpClient(),
+        provideStore({ duplicatedEmails: duplicatedEmailsReducer }),
     ],
 };

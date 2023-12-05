@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable operator-linebreak */
 /* eslint-disable no-underscore-dangle */
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import {
     AbstractControl,
     FormBuilder,
@@ -16,9 +16,13 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { Router } from "@angular/router";
+import { Store } from "@ngrx/store";
+import { debounceTime, map, Observable, of, switchMap, take } from "rxjs";
 
 import { SnackbarComponent } from "../../core/components/snackbar/snackbar.component";
 import { DataService } from "../../core/services/data.service";
+import * as DuplicatedEmailsActions from "../../redux/actions/duplicated-emails.actions";
+import { AppState } from "../../redux/app.state";
 import { RegistrationData, SnackType } from "../../shared/models/data";
 
 @Component({
@@ -60,12 +64,19 @@ export class RegistrationPageComponent {
         password: this.password,
     });
 
+    duplicatedEmails$: Observable<string[]>;
+
     constructor(
         private _formBuilder: FormBuilder,
         private router: Router,
         private dataService: DataService,
-        public snackBar: SnackbarComponent
-    ) {}
+        public snackBar: SnackbarComponent,
+        private store: Store<AppState>
+    ) {
+        this.duplicatedEmails$ = this.store
+            .select("duplicatedEmails")
+            .pipe(map((state) => state.emails));
+    }
 
     getNameErrorMessage() {
         if (this.name.hasError("required")) {
@@ -100,16 +111,37 @@ export class RegistrationPageComponent {
         return "";
     }
 
+    // private emailValidator(
+    //     control: AbstractControl
+    // ): { [key: string]: boolean } | null {
+    //     const enteredEmail = control.value as string;
+    //     const duplications = JSON.parse(
+    //         localStorage.getItem("ConnectionsDuplications") || "[]"
+    //     ) as string[];
+    //     const isDuplicated = duplications.includes(enteredEmail);
+
+    //     return isDuplicated ? { duplicationError: true } : null;
+    // }
+
     private emailValidator(
         control: AbstractControl
-    ): { [key: string]: boolean } | null {
+    ): Observable<{ [key: string]: boolean } | null> {
         const enteredEmail = control.value as string;
-        const duplications = JSON.parse(
-            localStorage.getItem("ConnectionsDuplications") || "[]"
-        ) as string[];
-        const isDuplicated = duplications.includes(enteredEmail);
+        if (!this.duplicatedEmails$) {
+            return of(null);
+        }
+        return this.duplicatedEmails$.pipe(
+            take(1),
+            debounceTime(300),
+            switchMap((duplicatedEmails) => {
+                const isDuplicated = duplicatedEmails.includes(enteredEmail);
 
-        return isDuplicated ? { duplicationError: true } : null;
+                if (isDuplicated) {
+                    return of({ duplicationError: true });
+                }
+                return of(null);
+            })
+        );
     }
 
     private nameValidator(
@@ -160,13 +192,10 @@ export class RegistrationPageComponent {
                 ) {
                     this.isDuplicationError = true;
 
-                    const duplications = JSON.parse(
-                        localStorage.getItem("ConnectionsDuplications") || "[]"
-                    ) as string[];
-                    duplications.push(registrationData.email);
-                    localStorage.setItem(
-                        "ConnectionsDuplications",
-                        JSON.stringify(duplications)
+                    this.store.dispatch(
+                        DuplicatedEmailsActions.addDuplicatedEmail({
+                            email: registrationData.email,
+                        })
                     );
 
                     this.snackBar.showSnackbar(
