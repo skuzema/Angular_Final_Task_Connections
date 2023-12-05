@@ -2,6 +2,8 @@
 /* eslint-disable no-underscore-dangle */
 import { Injectable, Renderer2, RendererFactory2 } from "@angular/core";
 
+import { LocalStorageService } from "./local-storage.service";
+
 @Injectable({
     providedIn: "root",
 })
@@ -10,7 +12,10 @@ export class ColorSchemeService {
     private colorScheme!: string;
     private colorSchemePrefix = "color-scheme-";
 
-    constructor(rendererFactory: RendererFactory2) {
+    constructor(
+        rendererFactory: RendererFactory2,
+        private lsService: LocalStorageService
+    ) {
         this.renderer = rendererFactory.createRenderer(null, null);
     }
 
@@ -31,13 +36,11 @@ export class ColorSchemeService {
 
     _setColorScheme(scheme: string) {
         this.colorScheme = scheme;
-        localStorage.setItem("ConnectionsPrefersColor", scheme);
+        this.lsService.setColorScheme(scheme);
     }
 
     _getColorScheme() {
-        const localStorageColorScheme = localStorage.getItem(
-            "ConnectionsPrefersColor"
-        );
+        const localStorageColorScheme = this.lsService.getColorScheme();
         if (localStorageColorScheme) {
             this.colorScheme = localStorageColorScheme;
         } else {

@@ -8,6 +8,7 @@ import {
     RegistrationData,
     Response,
 } from "../../shared/models/data";
+import { LocalStorageService } from "./local-storage.service";
 
 @Injectable({
     providedIn: "root",
@@ -17,7 +18,10 @@ export class DataService {
     private response = new BehaviorSubject<Response>({ type: "", message: "" });
     public response$ = this.response.asObservable();
 
-    constructor(private http: HttpClient) {}
+    constructor(
+        private http: HttpClient,
+        private lsService: LocalStorageService
+    ) {}
 
     addUser(data: RegistrationData): Observable<Response> {
         const url = `${this.apiUrl}/registration`;
@@ -42,12 +46,9 @@ export class DataService {
                     };
 
                     if (response.token && response.uid && data.email) {
-                        localStorage.setItem(
-                            "ConnectionsToken",
-                            response.token
-                        );
-                        localStorage.setItem("ConnectionsUid", response.uid);
-                        localStorage.setItem("ConnectionsEmail", data.email);
+                        this.lsService.setToken(response.token);
+                        this.lsService.setUid(response.uid);
+                        this.lsService.setUid(data.email);
                     }
 
                     this.response.next(castedResponse);
