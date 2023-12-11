@@ -48,7 +48,7 @@ export class DataService {
                     if (response.token && response.uid && data.email) {
                         this.lsService.setToken(response.token);
                         this.lsService.setUid(response.uid);
-                        this.lsService.setUid(data.email);
+                        this.lsService.setEmail(data.email);
                     }
 
                     this.response.next(castedResponse);

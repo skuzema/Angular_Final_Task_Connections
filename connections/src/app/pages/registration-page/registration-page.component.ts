@@ -67,8 +67,6 @@ export class RegistrationPageComponent {
         password: this.password,
     });
 
-    // duplicatedEmails$: Observable<string[]>;
-
     constructor(
         private _formBuilder: FormBuilder,
         private router: Router,

@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 /* eslint-disable no-underscore-dangle */
 import { Component } from "@angular/core";
 import {
@@ -14,8 +15,9 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { Router } from "@angular/router";
 
+import { SnackbarComponent } from "../../core/components/snackbar/snackbar.component";
 import { DataService } from "../../core/services/data.service";
-import { LoginData } from "../../shared/models/data";
+import { LoginData, SnackType } from "../../shared/models/data";
 
 @Component({
     selector: "app-login-page",
@@ -30,13 +32,17 @@ import { LoginData } from "../../shared/models/data";
         MatInputModule,
         MatIconModule,
     ],
+    providers: [SnackbarComponent],
     templateUrl: "./login-page.component.html",
     styleUrl: "./login-page.component.scss",
 })
 export class LoginPageComponent {
+    hide = true;
+    isLoading = false;
+    notFountError = false;
+
     email = new FormControl("", [Validators.required, Validators.email]);
     password = new FormControl("", [Validators.required]);
-    hide = true;
 
     loginForm = this._formBuilder.group({
         email: this.email,
@@ -46,7 +52,8 @@ export class LoginPageComponent {
     constructor(
         private _formBuilder: FormBuilder,
         private router: Router,
-        private dataService: DataService
+        private dataService: DataService,
+        public snackBar: SnackbarComponent
     ) {}
 
     getEmailErrorMessage() {
@@ -67,14 +74,46 @@ export class LoginPageComponent {
     }
 
     onSubmit() {
+        this.isLoading = true;
+
         const loginData: LoginData = {
             email: this.loginForm.value.email!,
             password: this.loginForm.value.password!,
         };
 
-        this.dataService.login(loginData).subscribe(() => {
-            this.router.navigate(["/main"]);
-        });
+        this.dataService.login(loginData).subscribe(
+            () => {
+                this.isLoading = false;
+                this.snackBar.showSnackbar(
+                    "Login successful",
+                    SnackType.success
+                );
+                this.router.navigate(["/main"]);
+            },
+            (error) => {
+                this.isLoading = false;
+
+                if (
+                    error.status === 400 &&
+                    error.error.type === "NotFoundException"
+                ) {
+                    this.notFountError = true;
+                    this.snackBar.showSnackbar(
+                        error.error.message,
+                        SnackType.error
+                    );
+                } else {
+                    const msg = error.error.message
+                        ? error.error.message
+                        : "Network error";
+                    this.snackBar.showSnackbar(msg, SnackType.error);
+                }
+            }
+        );
+    }
+
+    onFieldChange() {
+        this.notFountError = false;
     }
 
     onSignUp() {

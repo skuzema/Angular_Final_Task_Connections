@@ -1,6 +1,7 @@
 /* eslint-disable implicit-arrow-linebreak */
 import { Routes } from "@angular/router";
 
+import { AuthGuard } from "./core/guards/auth.guard";
 import { NotFoundPageComponent } from "./pages/not-found-page/not-found-page.component";
 
 export const routes: Routes = [
@@ -11,6 +12,8 @@ export const routes: Routes = [
             import("./pages/main-page/main-page.component").then(
                 (m) => m.MainPageComponent
             ),
+        canLoad: [AuthGuard],
+        canActivate: [AuthGuard],
     },
     {
         path: "signup",

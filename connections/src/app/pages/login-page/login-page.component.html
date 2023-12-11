@@ -6,14 +6,14 @@
         <mat-card-content>
             <mat-form-field>
                 <mat-label>Email</mat-label>
-                <input matInput placeholder="test@example.com" [formControl]="email" required>
+                <input matInput placeholder="test@example.com" [formControl]="email" required (input)="onFieldChange()">
                 @if (email.invalid) {
                   <mat-error>{{getEmailErrorMessage()}}</mat-error>
                 }
             </mat-form-field>
             <mat-form-field>
                 <mat-label>Enter your password</mat-label>
-                <input matInput [formControl]="password" required [type]="hide ? 'password' : 'text'">
+                <input matInput [formControl]="password" required [type]="hide ? 'password' : 'text'" (input)="onFieldChange()">
                 <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
                   <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </button>
@@ -24,7 +24,8 @@
         </mat-card-content>
         <mat-card-actions align="end">
             <button class="main-btn" mat-stroked-button color="accent" (click)="onSignUp()">Sign Up</button>
-            <button class="main-btn" mat-raised-button color="primary" (click)="onSubmit()">Submit</button>
+            <button class="main-btn" mat-raised-button color="primary" (click)="onSubmit()"
+                    [disabled]="loginForm.invalid || notFountError || isLoading">Submit</button>
         </mat-card-actions>
     </mat-card>
 </div>

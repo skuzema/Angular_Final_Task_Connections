@@ -29,4 +29,24 @@ export class LocalStorageService {
     setEmail(email: string): void {
         localStorage.setItem(this.LS_EMAIL, email);
     }
+
+    checkCredentials(): boolean {
+        const token = localStorage.getItem(this.LS_TOKEN);
+        const uid = localStorage.getItem(this.LS_UID);
+        const email = localStorage.getItem(this.LS_EMAIL);
+
+        return !!token && !!uid && !!email;
+    }
+
+    getCredentials(): {
+        token: string | null;
+        uid: string | null;
+        email: string | null;
+    } {
+        const token = localStorage.getItem(this.LS_TOKEN);
+        const uid = localStorage.getItem(this.LS_UID);
+        const email = localStorage.getItem(this.LS_EMAIL);
+
+        return { token, uid, email };
+    }
 }
