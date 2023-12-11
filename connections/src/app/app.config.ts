@@ -13,12 +13,11 @@ import { duplicatedEmailsReducer } from "./redux/reducers/duplicated-emails.redu
 export const appConfig: ApplicationConfig = {
     providers: [
         provideRouter(routes),
-        provideStore(),
+        provideStore({ duplicatedEmails: duplicatedEmailsReducer }),
         provideEffects(),
         provideRouterStore(),
         provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
         provideAnimations(),
         provideHttpClient(),
-        provideStore({ duplicatedEmails: duplicatedEmailsReducer }),
     ],
 };
