@@ -50,7 +50,7 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-               "src/_redirects",
+               "./_redirects",
             ],
             "styles": [
               "@angular/material/prebuilt-themes/indigo-pink.css",
@@ -112,7 +112,7 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/_redirects", 
+              "./_redirects", 
             ],
             "styles": [
               "@angular/material/prebuilt-themes/indigo-pink.css",
