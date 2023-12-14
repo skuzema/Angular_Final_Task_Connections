@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable, tap } from "rxjs";
 
@@ -59,5 +59,14 @@ export class DataService {
                 }
             )
         );
+    }
+
+    logout(): Observable<void> {
+        const credentials = this.lsService.getCredentials();
+        const headers = new HttpHeaders({
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${credentials.token}`,
+        });
+        return this.http.delete<void>(`${this.apiUrl}/logout`, { headers });
     }
 }

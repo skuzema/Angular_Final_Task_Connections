@@ -1,8 +1,12 @@
+/* eslint-disable class-methods-use-this */
 import { Component, OnInit } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { Router } from "@angular/router";
+import { Store } from "@ngrx/store";
 
+import { logout } from "../../../redux/actions/profile.actions";
+import { AppState } from "../../../redux/app.state";
 import { ColorSchemeService } from "../../services/color-scheme.service";
 
 @Component({
@@ -16,7 +20,9 @@ export class HeaderComponent implements OnInit {
     public colorScheme = "";
     constructor(
         public colorSchemeService: ColorSchemeService,
-        private router: Router
+        private router: Router,
+        // eslint-disable-next-line @ngrx/no-typed-global-store
+        private store: Store<AppState>
     ) {}
 
     ngOnInit(): void {
@@ -34,5 +40,10 @@ export class HeaderComponent implements OnInit {
 
     onLogin() {
         this.router.navigate(["/signin"]);
+    }
+
+    onLogout(): void {
+        console.log("onLogout");
+        this.store.dispatch(logout());
     }
 }
