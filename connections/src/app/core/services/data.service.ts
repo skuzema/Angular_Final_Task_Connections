@@ -1,12 +1,13 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable, tap } from "rxjs";
+import { BehaviorSubject, catchError, map, Observable, tap } from "rxjs";
 
 import {
     LoginData,
     LoginResponseData,
     RegistrationData,
     Response,
+    UserProfileData,
 } from "../../shared/models/data";
 import { LocalStorageService } from "./local-storage.service";
 
@@ -61,12 +62,21 @@ export class DataService {
         );
     }
 
+    getUserProfile(): Observable<UserProfileData> {
+        return this.http.get<UserProfileData>(`${this.apiUrl}/profile`).pipe(
+            map((response: any) => ({
+                email: response.email.S,
+                name: response.name.S,
+                uid: response.uid.S,
+                createdAt: response.createdAt.S,
+            })),
+            catchError((error) => {
+                throw error;
+            })
+        );
+    }
+
     logout(): Observable<void> {
-        const credentials = this.lsService.getCredentials();
-        const headers = new HttpHeaders({
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${credentials.token}`,
-        });
-        return this.http.delete<void>(`${this.apiUrl}/logout`, { headers });
+        return this.http.delete<void>(`${this.apiUrl}/logout`);
     }
 }

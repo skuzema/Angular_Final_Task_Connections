@@ -1,0 +1,19 @@
+<div class="profile-container">
+    <div *ngIf="(userProfile$ | async) as userProfile; else loading">
+        <mat-card class="profile-card">
+            <mat-card-header>
+                <mat-card-title>User Profile</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <p><strong>User ID:</strong> {{ userProfile.uid }}</p>
+                <p><strong>Email:</strong> {{ userProfile.email }}</p>
+                <p><strong>Creation Time:</strong> {{ userProfile?.createdAt?.S | date: "medium" }}</p>
+                <p><strong>User Name:</strong> {{ userProfile.name }}</p>
+            </mat-card-content>
+        </mat-card>
+    </div>
+    <ng-template #loading>
+        <mat-spinner></mat-spinner>
+    </ng-template>
+</div>
+

@@ -23,3 +23,18 @@ export enum SnackType {
     error = "error",
     success = "success",
 }
+
+export interface UserProfileData {
+    email: {
+        S: "string"; // user email
+    };
+    name: {
+        S: "string"; // user name
+    };
+    uid: {
+        S: "string"; // user id
+    };
+    createdAt: {
+        S: "string"; // unix timestamp in milliseconds when profile was created
+    };
+}

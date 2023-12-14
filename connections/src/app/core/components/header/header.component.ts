@@ -44,11 +44,11 @@ export class HeaderComponent implements OnInit {
     }
 
     onSetProfile(): void {
-        console.log("onSetProfile");
+        this.router.navigate(["/profile"]);
     }
 
     onLogout(): void {
-        console.log("onLogout");
+        // console.log("onLogout");
         this.store.dispatch(logout());
     }
 }
