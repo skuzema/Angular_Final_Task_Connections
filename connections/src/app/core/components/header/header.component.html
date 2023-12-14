@@ -1,13 +1,19 @@
 <div class="header-container">
     <div class="btn-container">
-        <button mat-mini-fab matTooltip="Primary" color="basic" (click)="onThemeSwitchChange()">
+        <button mat-mini-fab matTooltip="Primary" color="basic" (click)="onThemeSwitchChange()"
+        matTooltip="Change color scheme">
             <mat-icon>{{colorScheme === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
         </button>
-        <button mat-mini-fab matTooltip="Primary" color="basic" (click)="onLogout()">
+        <button mat-mini-fab matTooltip="Primary" color="basic" (click)="onSetProfile()"
+        matTooltip="User Profile">
+            <mat-icon>manage_accounts</mat-icon>
+        </button>
+        <button mat-mini-fab matTooltip="Primary" color="basic" (click)="onLogout()"
+        matTooltip="Logout">
             <mat-icon>logout</mat-icon>
         </button>
-        <button class="main-btn" mat-raised-button color="primary" (click)="onLogin()">Login</button>
-        <button class="main-btn" mat-stroked-button color="accent" (click)="onSignUp()">SignUp</button>
+        <button class="main-btn" mat-raised-button color="primary" (click)="onLogin()" matTooltip="User login">Login</button>
+        <button class="main-btn" mat-stroked-button color="accent" (click)="onSignUp()" matTooltip="User registration">SignUp</button>
     </div>
 </div>
 
