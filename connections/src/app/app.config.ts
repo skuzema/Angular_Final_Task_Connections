@@ -1,5 +1,5 @@
-import { HTTP_INTERCEPTORS, provideHttpClient } from "@angular/common/http";
-import { ApplicationConfig, isDevMode } from "@angular/core";
+import { HTTP_INTERCEPTORS, HttpClientModule, provideHttpClient } from "@angular/common/http";
+import { ApplicationConfig, importProvidersFrom, isDevMode } from "@angular/core";
 import { provideAnimations } from "@angular/platform-browser/animations";
 import { provideRouter } from "@angular/router";
 import { provideEffects } from "@ngrx/effects";
@@ -11,6 +11,7 @@ import { routes } from "./app.routes";
 import { duplicatedEmailsReducer } from "./redux/reducers/duplicated-emails.reducer";
 import { profileReducer } from "./redux/reducers/profile.reducer";
 import { AuthInterceptor } from "./shared/interceptors/auth.interceptor";
+import { ProfileEffects } from "./redux/effects/profile.effects";
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -19,9 +20,10 @@ export const appConfig: ApplicationConfig = {
             useClass: AuthInterceptor,
             multi: true,
         },
+        importProvidersFrom(HttpClientModule),
         provideRouter(routes),
         provideStore({ duplicatedEmails: duplicatedEmailsReducer, profile: profileReducer }),
-        provideEffects(),
+        provideEffects([ProfileEffects]),
         provideRouterStore(),
         provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
         provideAnimations(),

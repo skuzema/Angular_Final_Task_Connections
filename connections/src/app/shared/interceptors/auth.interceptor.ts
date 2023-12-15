@@ -13,15 +13,18 @@ import { LocalStorageService } from "../../core/services/local-storage.service";
 export class AuthInterceptor implements HttpInterceptor {
     credentials = this.lsService.getCredentials();
 
-    constructor(private lsService: LocalStorageService) {}
+    constructor(private lsService: LocalStorageService) {
+        console.log("constructor AuthInterceptor");
+    }
 
     intercept(
         request: HttpRequest<any>,
         next: HttpHandler
     ): Observable<HttpEvent<any>> {
+        console.log("intercept AuthInterceptor");
         if (
-            request.url.endsWith("/signup") ||
-            request.url.endsWith("/signin")
+            request.url.endsWith("/registration") ||
+            request.url.endsWith("/login")
         ) {
             return next.handle(request);
         }

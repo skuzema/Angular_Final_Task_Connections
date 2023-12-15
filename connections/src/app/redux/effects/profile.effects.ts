@@ -10,21 +10,24 @@ import * as profileActions from "../actions/profile.actions";
 
 @Injectable()
 export class ProfileEffects {
-    loadUserProfile$ = createEffect(() =>
-      this.actions$.pipe(
+    loadUserProfile$ = createEffect(() => {
+      console.log("ProfileEffects");
+      return this.actions$.pipe(
         ofType(profileActions.loadUserProfile),
         exhaustMap(() =>
           this.dataService.getUserProfile().pipe(
-            map((profile) =>
-              profileActions.loadUserProfileSuccess({ profile })
-            ),
-            catchError((error) =>
-              of(profileActions.loadUserProfileFailure({ error }))
-            )
+            map((profile) => {
+              console.log("Profile loaded successfully:", profile);
+              return profileActions.loadUserProfileSuccess({ profile })
+            }),
+            catchError((error) => {
+              console.error("Error loading user profile:", error);
+              return of(profileActions.loadUserProfileFailure({ error }))
+            })
           )
         )
       )
-    );
+    });
   
     constructor(
       private actions$: Actions,
@@ -32,22 +35,3 @@ export class ProfileEffects {
     ) {}
 }
 
-// export class ProfileEffects {
-//     loadUserProfile$ = createEffect(() =>
-//         this.actions$.pipe(
-//             ofType(profileActions.loadUserProfile),
-//             mergeMap(() =>
-//                 this.dataService.getUserProfile().pipe(
-//                     map((profile) =>
-//                         profileActions.setUserProfile({ profile })
-//                     ),
-//                     catchError((error) =>
-//                         of(profileActions.setUserProfileError({ error }))
-//                     )
-//                 )
-//             )
-//         )
-//     );
-
-//     constructor(private actions$: Actions, private dataService: DataService) {}
-// }
