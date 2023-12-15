@@ -9,6 +9,7 @@ import { provideStoreDevtools } from "@ngrx/store-devtools";
 
 import { routes } from "./app.routes";
 import { duplicatedEmailsReducer } from "./redux/reducers/duplicated-emails.reducer";
+import { profileReducer } from "./redux/reducers/profile.reducer";
 import { AuthInterceptor } from "./shared/interceptors/auth.interceptor";
 
 export const appConfig: ApplicationConfig = {
@@ -19,7 +20,7 @@ export const appConfig: ApplicationConfig = {
             multi: true,
         },
         provideRouter(routes),
-        provideStore({ duplicatedEmails: duplicatedEmailsReducer }),
+        provideStore({ duplicatedEmails: duplicatedEmailsReducer, profile: profileReducer }),
         provideEffects(),
         provideRouterStore(),
         provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
