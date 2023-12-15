@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from "@angular/common/http";
 import { createReducer, on } from "@ngrx/store";
 
 import { UserProfileData } from "../../shared/models/data";
@@ -5,7 +6,7 @@ import * as profileActions from "../actions/profile.actions";
 
 export interface ProfileState {
     userProfile: UserProfileData | null;
-    error: string | null;
+    error: HttpErrorResponse | null;
     isEditing: boolean | null;
 }
 
@@ -22,12 +23,12 @@ export const profileReducer = createReducer(
         ...state,
         userProfile: profile,
         error: null,
-      })),
-      on(profileActions.loadUserProfileFailure, (state, { error }) => ({
+    })),
+    on(profileActions.loadUserProfileFailure, (state, { error }) => ({
         ...state,
         userProfile: null,
         error,
-      })),
+    })),
     on(profileActions.setUserProfile, (state, { profile }) => ({
         ...state,
         userProfile: profile,

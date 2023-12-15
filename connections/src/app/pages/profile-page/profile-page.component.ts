@@ -1,65 +1,75 @@
+/* eslint-disable function-paren-newline */
+/* eslint-disable implicit-arrow-linebreak */
+/* eslint-disable class-methods-use-this */
 import { CommonModule } from "@angular/common";
+import { HttpErrorResponse } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
-import { MatCardModule } from "@angular/material/card";
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
-import { MatIconModule } from "@angular/material/icon";
-import { Store } from "@ngrx/store";
-import { Observable, tap } from "rxjs";
-
-import * as profileActions from "../../redux/actions/profile.actions";
-import { selectProfileError, selectUserProfile } from "../../redux/selectors/profile.selectors";
-import { UserProfileData, SnackType } from "../../shared/models/data";
-import { MatButtonModule } from "@angular/material/button";
-import {     
+import {
     AbstractControl,
-    AsyncValidatorFn,
     FormBuilder,
     FormControl,
     FormsModule,
     ReactiveFormsModule,
-    Validators 
+    Validators,
 } from "@angular/forms";
+import { MatButtonModule } from "@angular/material/button";
+import { MatCardModule } from "@angular/material/card";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { Store } from "@ngrx/store";
+import { map, Observable, tap } from "rxjs";
+
 import { SnackbarComponent } from "../../core/components/snackbar/snackbar.component";
+import * as profileActions from "../../redux/actions/profile.actions";
+import {
+    selectProfileError,
+    selectUserProfile,
+} from "../../redux/selectors/profile.selectors";
+import { Response, SnackType, UserProfileData } from "../../shared/models/data";
 
 @Component({
     selector: "app-profile-page",
     standalone: true,
     imports: [
-        CommonModule, 
-        MatProgressSpinnerModule, 
-        MatCardModule, 
+        CommonModule,
+        MatProgressSpinnerModule,
+        MatCardModule,
         MatButtonModule,
         MatFormFieldModule,
         FormsModule,
         ReactiveFormsModule,
         MatFormFieldModule,
         MatInputModule,
-        MatIconModule],
+        MatIconModule,
+    ],
     providers: [SnackbarComponent],
     templateUrl: "./profile-page.component.html",
     styleUrl: "./profile-page.component.scss",
 })
 export class ProfilePageComponent implements OnInit {
     userProfile$: Observable<UserProfileData | null>;
-    profileError$: Observable<string | null>;
+    profileError$: Observable<HttpErrorResponse | null>;
 
-    name = new FormControl({value: "", disabled: true}, [Validators.required, this.nameValidator]);
-    email = new FormControl({value: "", disabled: true});
-    uid = new FormControl({value: "", disabled: true});
-    createdAt = new FormControl({value: "", disabled: true});
+    name = new FormControl({ value: "", disabled: true }, [
+        Validators.required,
+        this.nameValidator,
+    ]);
+    email = new FormControl({ value: "", disabled: true });
+    uid = new FormControl({ value: "", disabled: true });
+    createdAt = new FormControl({ value: "", disabled: true });
 
-    registrationForm = this._formBuilder.group({
+    registrationForm = this.formBuilder.group({
         name: this.name,
         email: this.email,
         uid: this.uid,
         createdAt: this.createdAt,
     });
-    
+
     constructor(
-        private store: Store, 
-        private _formBuilder: FormBuilder, 
+        private store: Store,
+        private formBuilder: FormBuilder,
         public snackBar: SnackbarComponent
     ) {
         this.userProfile$ = this.store.select(selectUserProfile);
@@ -67,28 +77,33 @@ export class ProfilePageComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        console.log("profile ngOnInit");
         this.store.dispatch(profileActions.loadUserProfile());
 
-        this.userProfile$.subscribe(userProfile => {
-            if (userProfile) {
-console.log("userProfile:", userProfile);                
-                const valuesUserProfile = {
-                    name: "test",
-                    email: userProfile.email.S,
-                    uid: userProfile.uid.S,
-                    createdAt: userProfile.createdAt.S
-                };
-console.log("values:", valuesUserProfile);
-                this.registrationForm.patchValue(valuesUserProfile);
-            }
-        });
+        this.userProfile$
+            .pipe(
+                map((userProfile) => ({
+                    ...userProfile,
+                    createdAt: userProfile?.createdAt
+                        ? this.formatDate(userProfile.createdAt)
+                        : "",
+                })),
+                tap((userProfile) =>
+                    this.registrationForm.patchValue(userProfile)
+                )
+            )
+            .subscribe();
 
-        this.profileError$.subscribe(error => {
+        this.profileError$.subscribe((error) => {
+            console.error("profileError$:", error);
             if (error) {
-                this.snackBar.showSnackbar(error, SnackType.error);
+                const err: Response = error.error;
+                this.snackBar.showSnackbar(err.message, SnackType.error);
             }
         });
+    }
+
+    private formatDate(timestamp: string): string {
+        return new Date(parseInt(timestamp, 10)).toLocaleString();
     }
 
     private nameValidator(

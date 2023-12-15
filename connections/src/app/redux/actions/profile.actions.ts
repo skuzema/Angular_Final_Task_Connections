@@ -8,7 +8,7 @@ export const loadUserProfileSuccess = createAction(
     "[Profile] Load User Profile Success",
     props<{ profile: UserProfileData }>()
 );
-  
+
 export const loadUserProfileFailure = createAction(
     "[Profile] Load User Profile Failure",
     props<{ error: any }>()

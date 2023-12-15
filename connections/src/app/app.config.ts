@@ -8,10 +8,10 @@ import { provideStore } from "@ngrx/store";
 import { provideStoreDevtools } from "@ngrx/store-devtools";
 
 import { routes } from "./app.routes";
+import { ProfileEffects } from "./redux/effects/profile.effects";
 import { duplicatedEmailsReducer } from "./redux/reducers/duplicated-emails.reducer";
 import { profileReducer } from "./redux/reducers/profile.reducer";
 import { AuthInterceptor } from "./shared/interceptors/auth.interceptor";
-import { ProfileEffects } from "./redux/effects/profile.effects";
 
 export const appConfig: ApplicationConfig = {
     providers: [

@@ -23,8 +23,8 @@ export class AuthInterceptor implements HttpInterceptor {
     ): Observable<HttpEvent<any>> {
         console.log("intercept AuthInterceptor");
         if (
-            request.url.endsWith("/registration") ||
-            request.url.endsWith("/login")
+            request.url.endsWith("/registration")
+            || request.url.endsWith("/login")
         ) {
             return next.handle(request);
         }
