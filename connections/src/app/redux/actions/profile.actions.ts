@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from "@angular/common/http";
 import { createAction, props } from "@ngrx/store";
 
 import { UserProfileData } from "../../shared/models/data";
@@ -11,17 +12,22 @@ export const loadUserProfileSuccess = createAction(
 
 export const loadUserProfileFailure = createAction(
     "[Profile] Load User Profile Failure",
-    props<{ error: any }>()
+    props<{ error: HttpErrorResponse }>()
 );
 
-export const setUserProfile = createAction(
-    "[Profile] Set User Profile",
-    props<{ profile: UserProfileData }>()
+export const updateProfile = createAction(
+    "[Profile] Save Profile",
+    props<{ name: string | null | undefined }>()
 );
 
-export const setUserProfileError = createAction(
-    "[Profile] Set User Profile Error",
-    props<{ error: string }>()
+export const updateProfileSuccess = createAction(
+    "[Profile] Update Profile Success",
+    props<{ name: string | null | undefined }>()
+);
+
+export const updateProfileError = createAction(
+    "[Profile] Update Profile Error",
+    props<{ error: HttpErrorResponse }>()
 );
 
 export const logout = createAction("[Profile] Logout");

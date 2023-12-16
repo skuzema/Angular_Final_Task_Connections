@@ -48,7 +48,6 @@ export class HeaderComponent implements OnInit {
     }
 
     onLogout(): void {
-        // console.log("onLogout");
         this.store.dispatch(logout());
     }
 }

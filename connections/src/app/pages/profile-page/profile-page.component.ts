@@ -1,3 +1,4 @@
+/* eslint-disable object-curly-newline */
 /* eslint-disable function-paren-newline */
 /* eslint-disable implicit-arrow-linebreak */
 /* eslint-disable class-methods-use-this */
@@ -19,7 +20,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { Store } from "@ngrx/store";
-import { map, Observable, tap } from "rxjs";
+import { catchError, map, Observable, of, switchMap, tap } from "rxjs";
 
 import { SnackbarComponent } from "../../core/components/snackbar/snackbar.component";
 import * as profileActions from "../../redux/actions/profile.actions";
@@ -51,6 +52,8 @@ import { Response, SnackType, UserProfileData } from "../../shared/models/data";
 export class ProfilePageComponent implements OnInit {
     userProfile$: Observable<UserProfileData | null>;
     profileError$: Observable<HttpErrorResponse | null>;
+    isEditing = false;
+    isSaving = false;
 
     name = new FormControl({ value: "", disabled: true }, [
         Validators.required,
@@ -78,7 +81,10 @@ export class ProfilePageComponent implements OnInit {
 
     ngOnInit(): void {
         this.store.dispatch(profileActions.loadUserProfile());
+        this.loadProfileData();
+    }
 
+    private loadProfileData() {
         this.userProfile$
             .pipe(
                 map((userProfile) => ({
@@ -94,7 +100,6 @@ export class ProfilePageComponent implements OnInit {
             .subscribe();
 
         this.profileError$.subscribe((error) => {
-            console.error("profileError$:", error);
             if (error) {
                 const err: Response = error.error;
                 this.snackBar.showSnackbar(err.message, SnackType.error);
@@ -123,5 +128,69 @@ export class ProfilePageComponent implements OnInit {
             return "Allowed only letters or spaces, maximum 40 characters";
         }
         return "";
+    }
+
+    private enableFormEditing(): void {
+        this.isEditing = true;
+        this.name.enable();
+    }
+
+    private disableFormEditing(): void {
+        this.isEditing = false;
+        this.name.disable();
+    }
+
+    private resetForm(): void {
+        this.registrationForm.reset();
+        this.disableFormEditing();
+    }
+
+    private applyFormValues(userProfile: UserProfileData): void {
+        this.registrationForm.patchValue({
+            name: userProfile.name,
+        });
+    }
+
+    onEditClick(): void {
+        this.enableFormEditing();
+    }
+
+    onCancelClick(): void {
+        this.resetForm();
+        this.loadProfileData();
+    }
+
+    onSaveClick(): void {
+        if (this.registrationForm.invalid || this.isSaving) {
+            return;
+        }
+
+        this.isSaving = true;
+        this.store.dispatch(
+            profileActions.updateProfile({
+                name: this.registrationForm.get("name")?.value,
+            })
+        );
+
+        this.userProfile$
+            .pipe(
+                switchMap(() => this.userProfile$),
+                catchError((error) => {
+                    this.isSaving = false;
+                    this.snackBar.showSnackbar(error, SnackType.error);
+                    return of(error);
+                })
+            )
+            .subscribe((userProfile) => {
+                if (userProfile) {
+                    this.applyFormValues(userProfile);
+                    this.disableFormEditing();
+                    this.isSaving = false;
+                    this.snackBar.showSnackbar(
+                        "Profile updated successfully.",
+                        SnackType.success
+                    );
+                }
+            });
     }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 import {
     HttpEvent,
     HttpHandler,
@@ -13,18 +14,15 @@ import { LocalStorageService } from "../../core/services/local-storage.service";
 export class AuthInterceptor implements HttpInterceptor {
     credentials = this.lsService.getCredentials();
 
-    constructor(private lsService: LocalStorageService) {
-        console.log("constructor AuthInterceptor");
-    }
+    constructor(private lsService: LocalStorageService) {}
 
     intercept(
         request: HttpRequest<any>,
         next: HttpHandler
     ): Observable<HttpEvent<any>> {
-        console.log("intercept AuthInterceptor");
         if (
-            request.url.endsWith("/registration")
-            || request.url.endsWith("/login")
+            request.url.endsWith("/registration") ||
+            request.url.endsWith("/login")
         ) {
             return next.handle(request);
         }

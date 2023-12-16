@@ -1,8 +1,7 @@
+/* eslint-disable object-curly-newline */
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import {
-    BehaviorSubject, catchError, map, Observable, tap
-} from "rxjs";
+import { BehaviorSubject, catchError, map, Observable, tap } from "rxjs";
 
 import {
     LoginData,
@@ -75,6 +74,17 @@ export class DataService {
             catchError((error) => {
                 throw error;
             })
+        );
+    }
+
+    updateUserProfile(name: string): Observable<Response> {
+        const url = `${this.apiUrl}/profile`;
+
+        return this.http.put<Response>(url, { name }).pipe(
+            tap(
+                (response) => this.response.next(response),
+                (error) => this.response.next(error)
+            )
         );
     }
 

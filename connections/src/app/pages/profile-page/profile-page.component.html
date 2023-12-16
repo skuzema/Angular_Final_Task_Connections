@@ -26,9 +26,15 @@
                   </mat-form-field>
               </mat-card-content>
               <mat-card-actions align="end">
-                  <!-- <button class="main-btn" mat-stroked-button color="accent" (click)="onLogin()">Login</button>
-                  <button class="main-btn" mat-raised-button color="primary" (click)="onSubmit()"
-                          [disabled]="registrationForm.invalid || isDuplicationError || isLoading">Submit</button> -->
+                <button mat-flat-button color="primary" *ngIf="!isEditing" (click)="onEditClick()">
+                    Edit
+                </button>
+                <button mat-flat-button color="warn" *ngIf="isEditing" (click)="onCancelClick()" [disabled]="isSaving">
+                    Cancel
+                </button>
+                <button mat-flat-button color="primary" *ngIf="isEditing" (click)="onSaveClick()" [disabled]="isSaving || registrationForm.invalid">
+                    Save
+                </button>
               </mat-card-actions>
         </mat-card>
     </div>

@@ -25,8 +25,8 @@ export enum SnackType {
 }
 
 export interface UserProfileData {
-    email?: "string";
-    name?: "string";
-    uid?: "string";
-    createdAt?: "string";
+    email?: string;
+    name: string;
+    uid?: string;
+    createdAt?: string;
 }

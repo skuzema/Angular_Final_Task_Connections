@@ -1,3 +1,4 @@
+/* eslint-disable @ngrx/on-function-explicit-return-type */
 import { HttpErrorResponse } from "@angular/common/http";
 import { createReducer, on } from "@ngrx/store";
 
@@ -7,13 +8,11 @@ import * as profileActions from "../actions/profile.actions";
 export interface ProfileState {
     userProfile: UserProfileData | null;
     error: HttpErrorResponse | null;
-    isEditing: boolean | null;
 }
 
 export const initialState: ProfileState = {
     userProfile: null,
     error: null,
-    isEditing: false,
 };
 
 export const profileReducer = createReducer(
@@ -29,9 +28,20 @@ export const profileReducer = createReducer(
         userProfile: null,
         error,
     })),
-    on(profileActions.setUserProfile, (state, { profile }) => ({
+    on(profileActions.updateProfile, (state) => state),
+    on(profileActions.updateProfileSuccess, (state, { name }) => ({
         ...state,
-        userProfile: profile,
+        userProfile: {
+            ...state.userProfile,
+            name:
+                name !== undefined && name !== null
+                    ? name
+                    : state.userProfile!.name,
+        },
         error: null,
+    })),
+    on(profileActions.updateProfileError, (state, { error }) => ({
+        ...state,
+        error,
     }))
 );
