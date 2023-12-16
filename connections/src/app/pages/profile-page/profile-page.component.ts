@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 /* eslint-disable object-curly-newline */
 /* eslint-disable function-paren-newline */
 /* eslint-disable implicit-arrow-linebreak */
@@ -20,7 +21,16 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { Store } from "@ngrx/store";
-import { catchError, map, Observable, of, switchMap, tap } from "rxjs";
+import {
+    catchError,
+    map,
+    Observable,
+    of,
+    skip,
+    switchMap,
+    take,
+    tap,
+} from "rxjs";
 
 import { SnackbarComponent } from "../../core/components/snackbar/snackbar.component";
 import * as profileActions from "../../redux/actions/profile.actions";
@@ -175,6 +185,15 @@ export class ProfilePageComponent implements OnInit {
         this.userProfile$
             .pipe(
                 switchMap(() => this.userProfile$),
+                switchMap((userProfile) => {
+                    if (
+                        userProfile?.name !==
+                        this.registrationForm.get("name")?.value
+                    ) {
+                        return of(userProfile);
+                    }
+                    return this.userProfile$.pipe(skip(1), take(1));
+                }),
                 catchError((error) => {
                     this.isSaving = false;
                     this.snackBar.showSnackbar(error, SnackType.error);
