@@ -1,10 +1,15 @@
+/* eslint-disable function-paren-newline */
+/* eslint-disable implicit-arrow-linebreak */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable object-curly-newline */
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, catchError, map, Observable, of, tap } from "rxjs";
+import { BehaviorSubject, catchError, map, Observable, tap } from "rxjs";
 
 import {
+    GroupID,
+    GroupListData,
+    GroupListItem,
     LoginData,
     LoginResponseData,
     RegistrationData,
@@ -108,10 +113,52 @@ export class DataService {
         );
     }
 
-    private handleError<T>(operation = "operation", result?: T) {
-        return (error: any): Observable<T> => {
-            console.log(`${operation} failed: ${error.message}`);
-            return of(result as T);
+    getGroups(): Observable<GroupListData> {
+        const url = `${this.apiUrl}/groups/list`;
+
+        return this.http.get<GroupListData>(url).pipe(
+            map((response: GroupListData) =>
+                this.transformGroupsResponse(response)
+            ),
+            catchError((error) => {
+                throw error;
+            })
+        );
+    }
+
+    private transformGroupsResponse(response: any): GroupListData {
+        const transformedData: GroupListData = {
+            Count: response.Count ? +response.Count : 0,
+            Items: (response.Items || []).map((item: any) => ({
+                id: item.id?.S || "",
+                name: item.name?.S || "",
+                createdAt: item.createdAt?.S || "",
+                createdBy: item.createdBy?.S || "",
+            })) as GroupListItem[],
         };
+
+        return transformedData;
+    }
+
+    createGroup(name: string): Observable<GroupID> {
+        const url = `${this.apiUrl}/groups/create`;
+
+        return this.http.post<GroupID>(url, name).pipe(
+            tap(
+                (response: any) => this.response.next(response),
+                (error: Response) => this.response.next(error)
+            )
+        );
+    }
+
+    deleteGroup(groupId: string): Observable<Response> {
+        const url = `${this.apiUrl}/groups/delete?groupID=${groupId}`;
+
+        return this.http.delete<Response>(url).pipe(
+            tap(
+                (response: any) => this.response.next(response),
+                (error: Response) => this.response.next(error)
+            )
+        );
     }
 }

@@ -3,7 +3,7 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    height: 90vh;
+    height: 100vh;
 }
 
 mat-card-content {
@@ -32,4 +32,9 @@ mat-card-actions {
 
 mat-card-header {
     justify-content: space-between;
+    margin-bottom: 10px;
+
+    button {
+        margin-left: 10px;
+    }
 }

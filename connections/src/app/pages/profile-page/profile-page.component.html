@@ -3,9 +3,14 @@
         <mat-card class="profile-card">
             <mat-card-header>
                 <mat-card-title>User Profile</mat-card-title>
-                <button mat-mini-fab color="primary" *ngIf="!isEditing" (click)="onLogoutClick()" [disabled]="isSaving" matTooltip="Logout">
-                    <mat-icon>logout</mat-icon>
-                </button>
+                <div>
+                    <button mat-mini-fab color="primary" *ngIf="!isEditing" (click)="onHomeClick()" [disabled]="isSaving" matTooltip="Go to main page">
+                        <mat-icon>home</mat-icon>
+                    </button>
+                    <button mat-mini-fab color="primary" *ngIf="!isEditing" (click)="onLogoutClick()" [disabled]="isSaving" matTooltip="Logout">
+                        <mat-icon>logout</mat-icon>
+                    </button>
+                </div>
             </mat-card-header>
             <mat-card-content>
                   <mat-form-field>

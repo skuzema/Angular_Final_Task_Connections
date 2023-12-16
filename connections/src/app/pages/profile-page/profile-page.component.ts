@@ -40,7 +40,7 @@ import {
     selectProfileError,
     selectUserProfile,
 } from "../../redux/selectors/profile.selectors";
-import { Response, SnackType, UserProfileData } from "../../shared/models/data";
+import { SnackType, UserProfileData } from "../../shared/models/data";
 
 @Component({
     selector: "app-profile-page",
@@ -218,6 +218,10 @@ export class ProfilePageComponent implements OnInit {
                     );
                 }
             });
+    }
+
+    onHomeClick() {
+        this.router.navigate(["/"]);
     }
 
     onLogoutClick(): void {

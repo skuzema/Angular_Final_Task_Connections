@@ -1,3 +1,4 @@
+/* eslint-disable @ngrx/on-function-explicit-return-type */
 import { createReducer, on } from "@ngrx/store";
 
 import * as DuplicatedEmailsActions from "../actions/duplicated-emails.actions";

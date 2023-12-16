@@ -1,0 +1,23 @@
+<div class="group-container">
+    <h2>Group list</h2>
+    <div class="group-buttons">
+        <p>Next update: {{ updateCountdown }}</p>
+        <button mat-flat-button color="primary" [disabled]="isUpdateDisabled" (click)="onUpdateClick()">
+            Update
+        </button>
+        <button mat-flat-button color="primary" (click)="onCreateClick('New Group')">Create Group</button>
+    </div>
+    <div class="group-list" *ngIf="(groups$ | async) as groups; else loading">
+        <mat-nav-list>
+            @for (group of groups.Items; track group.id) {
+                <a mat-list-item href="..." >{{ group.name }}</a>
+                <button mat-icon-button (click)="onDeleteClick(group.id)" matListItemMeta>
+                    <mat-icon>delete</mat-icon>
+                 </button>
+            }
+        </mat-nav-list>
+    </div>
+    <ng-template #loading>
+        <mat-spinner></mat-spinner>
+    </ng-template>
+</div>

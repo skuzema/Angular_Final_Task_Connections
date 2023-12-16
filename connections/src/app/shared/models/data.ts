@@ -30,3 +30,28 @@ export interface UserProfileData {
     uid?: string;
     createdAt?: string;
 }
+
+export interface GroupListData {
+    Count?: number;
+    Items?: GroupListItem[];
+}
+
+export interface GroupListItem {
+    id: string; // group id
+    name: string; // group name
+    createdAt: string; // unix timestamp when group was created
+    createdBy: string; // user id who created this group
+}
+
+export interface GroupID {
+    groupID: string;
+}
+export interface PeopleListData {
+    Count: number;
+    Items: PeopleListItem[];
+}
+
+export interface PeopleListItem {
+    name: string; // user name
+    uid: string; // user id
+}

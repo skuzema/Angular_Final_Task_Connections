@@ -4,5 +4,10 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    height: 90vh;
+    height: expression(100vh - 60px);
+}
+
+.group-container, .people-container {
+    flex-grow: 1;
+    height: 100vh;
 }
