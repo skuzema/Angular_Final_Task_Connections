@@ -196,7 +196,8 @@ export class ProfilePageComponent implements OnInit {
                 }),
                 catchError((error) => {
                     this.isSaving = false;
-                    this.snackBar.showSnackbar(error, SnackType.error);
+                    const errMsg = error || "Error updating user profile!";
+                    this.snackBar.showSnackbar(errMsg, SnackType.error);
                     return of(error);
                 })
             )
