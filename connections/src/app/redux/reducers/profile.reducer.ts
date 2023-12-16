@@ -43,5 +43,15 @@ export const profileReducer = createReducer(
     on(profileActions.updateProfileError, (state, { error }) => ({
         ...state,
         error,
+    })),
+    on(profileActions.logout, (state) => state),
+    on(profileActions.logoutSuccess, (state) => ({
+        ...state,
+        error: null,
+    })),
+    on(profileActions.logoutFailure, (state, { error }) => ({
+        ...state,
+        userProfile: null,
+        error,
     }))
 );

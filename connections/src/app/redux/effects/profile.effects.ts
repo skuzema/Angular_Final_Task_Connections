@@ -24,18 +24,32 @@ export class ProfileEffects {
     loadUserProfile$ = createEffect(() => {
         return this.actions$.pipe(
             ofType(profileActions.loadUserProfile),
-            concatLatestFrom(() => this.store.select(selectUserProfile)),
-            filter(([, loaded]) => !loaded),
+            concatLatestFrom(() => {
+                console.log(
+                    "ProfileEffects, selectUserProfile:",
+                    !!this.store.select(selectUserProfile)
+                );
+                return this.store.select(selectUserProfile);
+            }),
+            filter(([payload, loaded]) => {
+                console.log("filter payload: ", !payload, payload);
+                console.log("filter loaded: ", !loaded, loaded);
+                return !loaded;
+            }),
             exhaustMap(() =>
                 this.dataService.getUserProfile().pipe(
-                    map((profile) =>
-                        profileActions.loadUserProfileSuccess({
+                    map((profile) => {
+                        console.log("loadUserProfile success", profile);
+                        return profileActions.loadUserProfileSuccess({
                             profile,
-                        })
-                    ),
-                    catchError((error) =>
-                        of(profileActions.loadUserProfileFailure({ error }))
-                    )
+                        });
+                    }),
+                    catchError((error) => {
+                        console.log("loadUserProfile catchError", error);
+                        return of(
+                            profileActions.loadUserProfileFailure({ error })
+                        );
+                    })
                 )
             ),
             take(1)
@@ -60,6 +74,24 @@ export class ProfileEffects {
                 }
                 return of();
             })
+        );
+    });
+
+    logout$ = createEffect(() => {
+        return this.actions$.pipe(
+            ofType(profileActions.logout),
+            switchMap(() =>
+                this.dataService.logout().pipe(
+                    map(() => {
+                        console.log("createEffect logout, success");
+                        return profileActions.logoutSuccess();
+                    }),
+                    catchError((error) => {
+                        console.log("createEffect logout, error:", error);
+                        return of(profileActions.logoutFailure({ error }));
+                    })
+                )
+            )
         );
     });
 

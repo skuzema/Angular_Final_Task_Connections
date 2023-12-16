@@ -1,7 +1,8 @@
+/* eslint-disable class-methods-use-this */
 /* eslint-disable object-curly-newline */
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, catchError, map, Observable, tap } from "rxjs";
+import { BehaviorSubject, catchError, map, Observable, of, tap } from "rxjs";
 
 import {
     LoginData,
@@ -64,7 +65,8 @@ export class DataService {
     }
 
     getUserProfile(): Observable<UserProfileData> {
-        return this.http.get<UserProfileData>(`${this.apiUrl}/profile`).pipe(
+        const url = `${this.apiUrl}/profile`;
+        return this.http.get<UserProfileData>(url).pipe(
             map((response: any) => ({
                 email: response.email.S,
                 name: response.name.S,
@@ -88,7 +90,28 @@ export class DataService {
         );
     }
 
-    logout(): Observable<void> {
-        return this.http.delete<void>(`${this.apiUrl}/logout`);
+    logout(): Observable<Response> {
+        const url = `${this.apiUrl}/logout`;
+
+        return this.http.delete<Response>(url).pipe(
+            tap(
+                (response) => {
+                    console.log("service logout, success:", response);
+                    this.lsService.clearUserData();
+                    this.response.next(response);
+                },
+                (error) => {
+                    console.log("service logout, error:", error);
+                    this.response.next(error);
+                }
+            )
+        );
+    }
+
+    private handleError<T>(operation = "operation", result?: T) {
+        return (error: any): Observable<T> => {
+            console.log(`${operation} failed: ${error.message}`);
+            return of(result as T);
+        };
     }
 }

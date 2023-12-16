@@ -20,6 +20,8 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { MatTooltipModule } from "@angular/material/tooltip";
+import { Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import {
     catchError,
@@ -54,6 +56,7 @@ import { Response, SnackType, UserProfileData } from "../../shared/models/data";
         MatFormFieldModule,
         MatInputModule,
         MatIconModule,
+        MatTooltipModule,
     ],
     providers: [SnackbarComponent],
     templateUrl: "./profile-page.component.html",
@@ -83,7 +86,8 @@ export class ProfilePageComponent implements OnInit {
     constructor(
         private store: Store,
         private formBuilder: FormBuilder,
-        public snackBar: SnackbarComponent
+        public snackBar: SnackbarComponent,
+        private router: Router
     ) {
         this.userProfile$ = this.store.select(selectUserProfile);
         this.profileError$ = this.store.select(selectProfileError);
@@ -103,18 +107,19 @@ export class ProfilePageComponent implements OnInit {
                         ? this.formatDate(userProfile.createdAt)
                         : "",
                 })),
-                tap((userProfile) =>
-                    this.registrationForm.patchValue(userProfile)
-                )
+                tap((userProfile) => {
+                    if (userProfile) {
+                        this.registrationForm.patchValue(userProfile);
+                    }
+                }),
+                catchError((error) => {
+                    const errMsg =
+                        error.error.message || "Error loading user profile!";
+                    this.snackBar.showSnackbar(errMsg, SnackType.error);
+                    return of(error);
+                })
             )
             .subscribe();
-
-        this.profileError$.subscribe((error) => {
-            if (error) {
-                const err: Response = error.error;
-                this.snackBar.showSnackbar(err.message, SnackType.error);
-            }
-        });
     }
 
     private formatDate(timestamp: string): string {
@@ -196,7 +201,8 @@ export class ProfilePageComponent implements OnInit {
                 }),
                 catchError((error) => {
                     this.isSaving = false;
-                    const errMsg = error || "Error updating user profile!";
+                    const errMsg =
+                        error.error.message || "Error updating user profile!";
                     this.snackBar.showSnackbar(errMsg, SnackType.error);
                     return of(error);
                 })
@@ -208,6 +214,33 @@ export class ProfilePageComponent implements OnInit {
                     this.isSaving = false;
                     this.snackBar.showSnackbar(
                         "Profile updated successfully.",
+                        SnackType.success
+                    );
+                }
+            });
+    }
+
+    onLogoutClick(): void {
+        this.store.dispatch(profileActions.logout());
+
+        this.profileError$
+            .pipe(
+                // skip(1),
+                take(1),
+                catchError(() => of(null))
+            )
+            .subscribe((error) => {
+                console.log("onLogoutClick 2,  subscribe, error:", error);
+                if (error) {
+                    console.log("onLogoutClick, error", error);
+                    console.log("error.error.message", error.error.message);
+                    const errMsg = error.error.message || "Logout error!";
+                    this.snackBar.showSnackbar(errMsg, SnackType.error);
+                } else {
+                    console.log("onLogoutClick 3, success");
+                    this.router.navigate(["/signin"]);
+                    this.snackBar.showSnackbar(
+                        "Logout successful",
                         SnackType.success
                     );
                 }

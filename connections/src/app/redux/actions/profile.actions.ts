@@ -31,3 +31,10 @@ export const updateProfileError = createAction(
 );
 
 export const logout = createAction("[Profile] Logout");
+
+export const logoutSuccess = createAction("[Profile] Logout Success");
+
+export const logoutFailure = createAction(
+    "[Profile] Logout Failure",
+    props<{ error: HttpErrorResponse }>()
+);
