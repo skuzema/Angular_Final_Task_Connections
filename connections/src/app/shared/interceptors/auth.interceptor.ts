@@ -39,6 +39,12 @@ export class AuthInterceptor implements HttpInterceptor {
         return this.storeCredentials$.pipe(
             take(1),
             switchMap((storeCredentials) => {
+                let credentials = {
+                    uid: "",
+                    email: "",
+                    token: "",
+                };
+
                 console.log(
                     "AuthInterceptor, uid:",
                     storeCredentials,
@@ -51,12 +57,11 @@ export class AuthInterceptor implements HttpInterceptor {
                     !storeCredentials?.email ||
                     !storeCredentials?.token
                 ) {
-                    // set values from local storage
                     console.log(
                         "AuthInterceptor, setup:",
                         this.credentials.uid
                     );
-                    const credentials: CredentialsData = {
+                    credentials = {
                         uid: this.credentials.uid!,
                         email: this.credentials.email!,
                         token: this.credentials.token!,
@@ -67,10 +72,11 @@ export class AuthInterceptor implements HttpInterceptor {
                 }
                 const modifiedRequest = request.clone({
                     setHeaders: {
-                        "rs-uid": storeCredentials?.uid || "",
-                        "rs-email": storeCredentials?.email || "",
+                        "rs-uid": storeCredentials?.uid || credentials.uid,
+                        "rs-email":
+                            storeCredentials?.email || credentials.email,
                         Authorization: `Bearer ${
-                            storeCredentials?.token || ""
+                            storeCredentials?.token || credentials.token
                         }`,
                     },
                 });

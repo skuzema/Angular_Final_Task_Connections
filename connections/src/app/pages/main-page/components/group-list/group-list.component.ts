@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatListModule } from "@angular/material/list";
@@ -10,6 +10,7 @@ import { Observable, Subject } from "rxjs";
 import * as groupActions from "../../../../redux/actions/group.actions";
 import * as groupSelectors from "../../../../redux/selectors/group.selectors";
 import { GroupListData } from "../../../../shared/models/data";
+import { SortByDatePipe } from "../../../../shared/pipes/sort-by-date.pipe";
 
 @Component({
     selector: "app-group-list",
@@ -20,11 +21,12 @@ import { GroupListData } from "../../../../shared/models/data";
         MatProgressSpinnerModule,
         MatListModule,
         MatIconModule,
+        SortByDatePipe,
     ],
     templateUrl: "./group-list.component.html",
     styleUrl: "./group-list.component.scss",
 })
-export class GroupListComponent implements OnInit, OnDestroy {
+export class GroupListComponent implements OnInit {
     groups$: Observable<GroupListData>;
     loading$: Observable<boolean>;
     error$: Observable<any>;
@@ -38,11 +40,6 @@ export class GroupListComponent implements OnInit, OnDestroy {
         this.groups$ = store.select(groupSelectors.selectGroups);
         this.loading$ = store.select(groupSelectors.selectLoading);
         this.error$ = store.select(groupSelectors.selectError);
-    }
-
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
     }
 
     ngOnInit() {

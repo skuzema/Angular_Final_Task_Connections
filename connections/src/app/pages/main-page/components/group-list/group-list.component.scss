@@ -1,15 +1,31 @@
-.group-container {
+:host {
+    display: block;
+    text-align: left;
+    padding: 20px;
+}
+
+.group-header {
     display: flex;
-    align-items: center;
-    justify-content: center;
     flex-direction: column;
-    // height: 100vh;
+    justify-content: space-around;
+}
+
+.group-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+
+    button {
+        margin-left: 10px;
+    }
+}
+
+.group-countdown {
+    flex-grow: 4;
+    align-self: center;
 }
 
 .group-list {
-    display: flex;
-    flex-direction: column;
     overflow: auto;
     max-height: 70vh;
-    // width: 50vw;
 }
