@@ -1,13 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import {
-    BehaviorSubject,
-    catchError,
-    filter,
-    map,
-    Observable,
-    tap,
-} from "rxjs";
+import { BehaviorSubject, catchError, map, Observable, tap } from "rxjs";
 
 import {
     GroupID,
@@ -150,8 +143,14 @@ export class DataService {
 
         return this.http.post<GroupID>(url, name).pipe(
             tap(
-                (response: any) => this.response.next(response),
-                (error: Response) => this.response.next(error)
+                (response: any) => {
+                    console.log("createGroup, success:", response);
+                    this.response.next(response);
+                },
+                (error: Response) => {
+                    console.log("createGroup, error:", error);
+                    this.response.next(error);
+                }
             )
         );
     }

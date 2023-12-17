@@ -35,17 +35,23 @@ export const groupReducer = createReducer(
         loading: false,
         error,
     })),
-
     on(GroupActions.createGroup, (state) => ({
         ...state,
         loading: true,
         error: null,
     })),
-    // on(GroupActions.createGroupSuccess, (state, { group }) => ({
-    //     ...state,
-    //     groups: [...state.groups, group],
-    //     loading: false,
-    // })),
+    on(GroupActions.createGroupSuccess, (state, { item }) => {
+        const existingItems = state.groups?.Items || [];
+        const updatedGroups: GroupListData = {
+            ...state.groups,
+            Items: [...existingItems, item],
+        };
+        return {
+            ...state,
+            groups: updatedGroups,
+            loading: false,
+        };
+    }),
     on(GroupActions.createGroupFailure, (state, { error }) => ({
         ...state,
         loading: false,

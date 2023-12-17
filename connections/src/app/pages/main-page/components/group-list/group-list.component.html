@@ -4,13 +4,13 @@
     </div>
     <div class="group-buttons">
         <div class="group-countdown">
-            <span>Next update: {{ updateCountdown }}</span>
+            <span>Next update after: {{ updateCountdown }}</span>
         </div>
         <div>
             <button mat-flat-button color="warn" [disabled]="isUpdateDisabled" (click)="onUpdateClick()">
                 Update
             </button>
-            <button mat-flat-button color="primary" (click)="onCreateClick('New Group')">Create Group</button>
+            <button mat-flat-button color="primary" (click)="openNewGroupDialog()">Create Group</button>
         </div>
     </div>
 </div>

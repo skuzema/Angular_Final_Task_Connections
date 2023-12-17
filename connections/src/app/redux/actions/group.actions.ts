@@ -17,10 +17,12 @@ export const createGroup = createAction(
     "[Group] Create Group",
     props<{ name: string }>()
 );
+
 export const createGroupSuccess = createAction(
     "[Group] Create Group Success",
-    props<{ group: GroupListItem }>()
+    props<{ item: GroupListItem }>()
 );
+
 export const createGroupFailure = createAction(
     "[Group] Create Group Failure",
     props<{ error: HttpErrorResponse }>()
@@ -30,10 +32,12 @@ export const deleteGroup = createAction(
     "[Group] Delete Group",
     props<{ groupId: string }>()
 );
+
 export const deleteGroupSuccess = createAction(
     "[Group] Delete Group Success",
     props<{ groupId: string }>()
 );
+
 export const deleteGroupFailure = createAction(
     "[Group] Delete Group Failure",
     props<{ error: HttpErrorResponse }>()

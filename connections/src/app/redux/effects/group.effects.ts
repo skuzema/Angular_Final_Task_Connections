@@ -5,8 +5,10 @@ import { of } from "rxjs";
 import { catchError, exhaustMap, filter, map, mergeMap } from "rxjs/operators";
 
 import { DataService } from "../../core/services/data.service";
+import { GroupListItem } from "../../shared/models/data";
 import * as groupActions from "../actions/group.actions";
 import { selectGroups } from "../selectors/group.selectors";
+import * as loginSelectors from "../selectors/login.selectors";
 
 @Injectable()
 export class GroupEffects {
@@ -42,19 +44,31 @@ export class GroupEffects {
         );
     });
 
-    // createGroup$ = createEffect(() => {
-    //     return this.actions$.pipe(
-    //         ofType(groupActions.createGroup),
-    //         mergeMap(({ name }) =>
-    //             this.dataService.createGroup(name).pipe(
-    //                 map((group) => groupActions.createGroupSuccess({ group })),
-    //                 catchError((error) =>
-    //                     of(groupActions.createGroupFailure({ error }))
-    //                 )
-    //             )
-    //         )
-    //     );
-    // });
+    createGroup$ = createEffect(() => {
+        return this.actions$.pipe(
+            ofType(groupActions.createGroup),
+            concatLatestFrom(() =>
+                this.store.select(loginSelectors.selectLoginResponse)
+            ),
+            mergeMap(([action, loginResponse]) =>
+                this.dataService.createGroup(action.name).pipe(
+                    map((data) => {
+                        const item: GroupListItem = {
+                            id: data.groupID || "",
+                            name: action.name,
+                            createdAt: Date.now().toString(),
+                            createdBy: loginResponse?.uid || "",
+                        };
+                        console.log("createGroupEffect, success:", data, item);
+                        return groupActions.createGroupSuccess({ item });
+                    }),
+                    catchError((error) =>
+                        of(groupActions.createGroupFailure({ error }))
+                    )
+                )
+            )
+        );
+    });
 
     deleteGroup$ = createEffect(() => {
         return this.actions$.pipe(

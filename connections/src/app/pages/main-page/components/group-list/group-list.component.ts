@@ -1,16 +1,18 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
+import { MatDialog } from "@angular/material/dialog";
 import { MatIconModule } from "@angular/material/icon";
 import { MatListModule } from "@angular/material/list";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { Store } from "@ngrx/store";
-import { Observable, Subject } from "rxjs";
+import { Observable } from "rxjs";
 
 import * as groupActions from "../../../../redux/actions/group.actions";
 import * as groupSelectors from "../../../../redux/selectors/group.selectors";
 import { GroupListData } from "../../../../shared/models/data";
 import { SortByDatePipe } from "../../../../shared/pipes/sort-by-date.pipe";
+import { NewGroupComponent } from "../new-group/new-group.component";
 
 @Component({
     selector: "app-group-list",
@@ -22,6 +24,7 @@ import { SortByDatePipe } from "../../../../shared/pipes/sort-by-date.pipe";
         MatListModule,
         MatIconModule,
         SortByDatePipe,
+        NewGroupComponent,
     ],
     templateUrl: "./group-list.component.html",
     styleUrl: "./group-list.component.scss",
@@ -33,30 +36,42 @@ export class GroupListComponent implements OnInit {
 
     updateCountdown: number | null = null;
     isUpdateDisabled = false;
+    groupName: string;
 
-    private destroy$: Subject<void> = new Subject<void>();
-
-    constructor(private store: Store) {
+    constructor(private store: Store, public dialog: MatDialog) {
         this.groups$ = store.select(groupSelectors.selectGroups);
         this.loading$ = store.select(groupSelectors.selectLoading);
         this.error$ = store.select(groupSelectors.selectError);
+        this.groupName = "";
     }
 
     ngOnInit() {
-        this.store.dispatch(groupActions.loadGroups());
+        // this.store.dispatch(groupActions.loadGroups());
     }
 
     onUpdateClick() {
         this.store.dispatch(groupActions.loadGroups());
     }
 
-    onCreateClick(name: string) {
-        this.store.dispatch(groupActions.createGroup({ name }));
-    }
-
     onDeleteClick(event: Event, groupId: string) {
         event.preventDefault();
         console.log("groupId:", groupId);
         // this.store.dispatch(groupActions.deleteGroup({ groupId }));
+    }
+
+    openNewGroupDialog(): void {
+        const dialogRef = this.dialog.open(NewGroupComponent, {
+            data: { groupName: this.groupName },
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.groupName = result;
+                console.log("The dialog was closed:", this.groupName);
+                this.store.dispatch(
+                    groupActions.createGroup({ name: this.groupName })
+                );
+            }
+        });
     }
 }
