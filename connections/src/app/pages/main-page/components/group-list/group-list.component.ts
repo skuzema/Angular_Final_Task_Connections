@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { CommonModule } from "@angular/common";
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
@@ -58,7 +59,8 @@ export class GroupListComponent implements OnInit, OnDestroy {
         this.store.dispatch(groupActions.createGroup({ name }));
     }
 
-    onDeleteClick(groupId: string) {
+    onDeleteClick(event: Event, groupId: string) {
+        event.preventDefault();
         console.log("groupId:", groupId);
         // this.store.dispatch(groupActions.deleteGroup({ groupId }));
     }

@@ -9,12 +9,15 @@
     </div>
     <div class="group-list" *ngIf="(groups$ | async) as groups; else loading">
         <mat-nav-list>
-            @for (group of groups.Items; track group.id) {
-                <a mat-list-item href="..." >{{ group.name }}</a>
-                <button mat-icon-button (click)="onDeleteClick(group.id)" matListItemMeta>
-                    <mat-icon>delete</mat-icon>
-                 </button>
-            }
+            <div class="group-item">
+                @for (group of groups.Items; track group.id) {
+                    <a mat-list-item href="/group/{{group.id}}" >{{ group.name }}
+                    <button mat-icon-button (click)="onDeleteClick($event, group.id)" matListItemMeta>
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </a>
+                }
+            </div>
         </mat-nav-list>
     </div>
     <ng-template #loading>
