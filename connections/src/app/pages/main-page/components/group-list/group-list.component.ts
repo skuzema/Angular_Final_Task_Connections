@@ -6,11 +6,12 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatListModule } from "@angular/material/list";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { Store } from "@ngrx/store";
-import { Observable } from "rxjs";
+import { Observable, skip, take } from "rxjs";
 
+import { SnackbarComponent } from "../../../../core/components/snackbar/snackbar.component";
 import * as groupActions from "../../../../redux/actions/group.actions";
 import * as groupSelectors from "../../../../redux/selectors/group.selectors";
-import { GroupListData } from "../../../../shared/models/data";
+import { GroupListData, SnackType } from "../../../../shared/models/data";
 import { SortByDatePipe } from "../../../../shared/pipes/sort-by-date.pipe";
 import { NewGroupComponent } from "../new-group/new-group.component";
 
@@ -26,6 +27,7 @@ import { NewGroupComponent } from "../new-group/new-group.component";
         SortByDatePipe,
         NewGroupComponent,
     ],
+    providers: [SnackbarComponent],
     templateUrl: "./group-list.component.html",
     styleUrl: "./group-list.component.scss",
 })
@@ -38,15 +40,20 @@ export class GroupListComponent implements OnInit {
     isUpdateDisabled = false;
     groupName: string;
 
-    constructor(private store: Store, public dialog: MatDialog) {
+    constructor(
+        private store: Store,
+        public dialog: MatDialog,
+        public snackBar: SnackbarComponent
+    ) {
         this.groups$ = store.select(groupSelectors.selectGroups);
         this.loading$ = store.select(groupSelectors.selectLoading);
         this.error$ = store.select(groupSelectors.selectError);
+
         this.groupName = "";
     }
 
     ngOnInit() {
-        // this.store.dispatch(groupActions.loadGroups());
+        this.store.dispatch(groupActions.loadGroups());
     }
 
     onUpdateClick() {
@@ -71,6 +78,36 @@ export class GroupListComponent implements OnInit {
                 this.store.dispatch(
                     groupActions.createGroup({ name: this.groupName })
                 );
+
+                this.groups$.subscribe((data) => {
+                    if (data) {
+                        console.log("loginResponse$, data", data);
+                        this.snackBar.showSnackbar(
+                            "Login successful",
+                            SnackType.success
+                        );
+                    }
+                });
+
+                this.error$.pipe(skip(1), take(1)).subscribe((error) => {
+                    if (error) {
+                        console.log("loginError$, data", error);
+                        if (
+                            error.status === 400 &&
+                            error.error.type === "NotFoundException"
+                        ) {
+                            this.snackBar.showSnackbar(
+                                error.error.message,
+                                SnackType.error
+                            );
+                        } else {
+                            const msg = error.error.message
+                                ? error.error.message
+                                : "Network error";
+                            this.snackBar.showSnackbar(msg, SnackType.error);
+                        }
+                    }
+                });
             }
         });
     }
