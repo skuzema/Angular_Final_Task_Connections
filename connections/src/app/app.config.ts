@@ -17,9 +17,11 @@ import { provideStoreDevtools } from "@ngrx/store-devtools";
 
 import { routes } from "./app.routes";
 import { GroupEffects } from "./redux/effects/group.effects";
+import { LoginEffects } from "./redux/effects/login.effects";
 import { ProfileEffects } from "./redux/effects/profile.effects";
 import { duplicatedEmailsReducer } from "./redux/reducers/duplicated-emails.reducer";
 import { groupReducer } from "./redux/reducers/group.reducer";
+import { loginReducer } from "./redux/reducers/login.reducer";
 import { profileReducer } from "./redux/reducers/profile.reducer";
 import { AuthInterceptor } from "./shared/interceptors/auth.interceptor";
 
@@ -35,9 +37,10 @@ export const appConfig: ApplicationConfig = {
         provideStore({
             duplicatedEmails: duplicatedEmailsReducer,
             profile: profileReducer,
-            group: groupReducer,
+            groups: groupReducer,
+            login: loginReducer,
         }),
-        provideEffects([ProfileEffects, GroupEffects]),
+        provideEffects([ProfileEffects, GroupEffects, LoginEffects]),
         provideRouterStore(),
         provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
         provideAnimations(),

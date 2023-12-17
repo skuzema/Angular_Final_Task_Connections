@@ -1,13 +1,15 @@
-/* eslint-disable operator-linebreak */
-/* eslint-disable class-methods-use-this */
 import { CommonModule } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { Router } from "@angular/router";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
 
+import * as loginSelectors from "../../../redux/selectors/login.selectors";
 import { ColorSchemeService } from "../../services/color-scheme.service";
+import { LocalStorageService } from "../../services/local-storage.service";
 
 @Component({
     selector: "app-header",
@@ -18,12 +20,18 @@ import { ColorSchemeService } from "../../services/color-scheme.service";
 })
 export class HeaderComponent implements OnInit {
     public colorScheme = "";
-    public isManageAccountsVisible = false;
+    isLogged$: Observable<boolean>;
 
     constructor(
         public colorSchemeService: ColorSchemeService,
-        private router: Router
-    ) {}
+        private router: Router,
+        private storageService: LocalStorageService,
+        private store: Store
+    ) {
+        this.isLogged$ = this.store.select(
+            loginSelectors.selectCredentialsValidity
+        );
+    }
 
     ngOnInit(): void {
         this.colorScheme = this.colorSchemeService.currentActive();
@@ -39,6 +47,11 @@ export class HeaderComponent implements OnInit {
     }
 
     onLogin() {
+        this.router.navigate(["/signin"]);
+    }
+
+    onLogout() {
+        this.storageService.clearUserData();
         this.router.navigate(["/signin"]);
     }
 

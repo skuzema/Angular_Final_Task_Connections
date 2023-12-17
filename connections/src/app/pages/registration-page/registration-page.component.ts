@@ -1,8 +1,3 @@
-/* eslint-disable object-curly-newline */
-/* eslint-disable @typescript-eslint/indent */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable operator-linebreak */
-/* eslint-disable no-underscore-dangle */
 import { Component } from "@angular/core";
 import {
     AbstractControl,
@@ -25,7 +20,6 @@ import { debounceTime, map, Observable, take } from "rxjs";
 import { SnackbarComponent } from "../../core/components/snackbar/snackbar.component";
 import { DataService } from "../../core/services/data.service";
 import * as DuplicatedEmailsActions from "../../redux/actions/duplicated-emails.actions";
-import { AppState } from "../../redux/app.state";
 import { selectDuplicatedEmails } from "../../redux/selectors/duplicated-emails.selectors";
 import { RegistrationData, SnackType } from "../../shared/models/data";
 
@@ -72,8 +66,7 @@ export class RegistrationPageComponent {
         private router: Router,
         private dataService: DataService,
         public snackBar: SnackbarComponent,
-        // eslint-disable-next-line @ngrx/no-typed-global-store
-        private store: Store<AppState>
+        private store: Store
     ) {}
 
     private emailValidator(): AsyncValidatorFn {

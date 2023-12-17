@@ -1,5 +1,3 @@
-/* eslint-disable operator-linebreak */
-/* eslint-disable no-underscore-dangle */
 import { Injectable, Renderer2, RendererFactory2 } from "@angular/core";
 
 import { LocalStorageService } from "./local-storage.service";
@@ -60,7 +58,6 @@ export class ColorSchemeService {
         this._setColorScheme(scheme);
         this.renderer.removeClass(
             document.body,
-            // eslint-disable-next-line operator-linebreak
             this.colorSchemePrefix +
                 (this.colorScheme === "dark" ? "light" : "dark")
         );

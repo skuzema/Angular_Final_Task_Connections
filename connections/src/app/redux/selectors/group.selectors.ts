@@ -2,7 +2,7 @@ import { createFeatureSelector, createSelector } from "@ngrx/store";
 
 import { GroupState } from "../reducers/group.reducer";
 
-const selectGroupState = createFeatureSelector<GroupState>("group");
+const selectGroupState = createFeatureSelector<GroupState>("groups");
 
 export const selectGroups = createSelector(
     selectGroupState,

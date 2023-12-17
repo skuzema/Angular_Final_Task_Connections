@@ -3,11 +3,13 @@
         <button mat-mini-fab color="basic" (click)="onThemeSwitchChange()" matTooltip="Change color scheme">
             <mat-icon>{{colorScheme === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
         </button>
-        <button mat-mini-fab color="basic" (click)="onSetProfile()" matTooltip="User Profile">
+        <button mat-mini-fab color="basic" *ngIf="(isLogged$ | async)" (click)="onSetProfile()" matTooltip="User Profile">
             <mat-icon>manage_accounts</mat-icon>
         </button>
-        <button class="main-btn" mat-raised-button color="primary" (click)="onLogin()" matTooltip="User login">Login</button>
-        <button class="main-btn" mat-stroked-button color="accent" (click)="onSignUp()" matTooltip="User registration">SignUp</button>
+        <button class="main-btn" mat-raised-button color="primary" *ngIf="(isLogged$ | async) === false"
+            (click)="onLogin()" matTooltip="User login">Login</button>
+        <button class="main-btn" mat-stroked-button color="accent" *ngIf="(isLogged$ | async) === false"
+            (click)="onSignUp()" matTooltip="User registration">SignUp</button>
     </div>
 </div>
 

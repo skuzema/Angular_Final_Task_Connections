@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import { CommonModule } from "@angular/common";
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
@@ -7,7 +6,6 @@ import { MatListModule } from "@angular/material/list";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { Store } from "@ngrx/store";
 import { Observable, Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
 
 import * as groupActions from "../../../../redux/actions/group.actions";
 import * as groupSelectors from "../../../../redux/selectors/group.selectors";

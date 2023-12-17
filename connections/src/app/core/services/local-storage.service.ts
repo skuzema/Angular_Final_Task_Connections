@@ -1,6 +1,7 @@
-/* eslint-disable class-methods-use-this */
-/* eslint-disable no-restricted-syntax */
 import { Injectable } from "@angular/core";
+import { Store } from "@ngrx/store";
+
+import * as loginActions from "../../redux/actions/login.actions";
 
 @Injectable({
     providedIn: "root",
@@ -10,6 +11,8 @@ export class LocalStorageService {
     private LS_TOKEN = "ConnectionsToken";
     private LS_UID = "ConnectionsUid";
     private LS_EMAIL = "ConnectionsEmail";
+
+    constructor(private store: Store) {}
 
     setColorScheme(scheme: string): void {
         localStorage.setItem(this.LS_CONNECTION_PREFERS_COLOR, scheme);
@@ -61,5 +64,15 @@ export class LocalStorageService {
             const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
             document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
         }
+
+        this.store.dispatch(
+            loginActions.setCredentials({
+                credentials: {
+                    uid: undefined,
+                    email: undefined,
+                    token: undefined,
+                },
+            })
+        );
     }
 }

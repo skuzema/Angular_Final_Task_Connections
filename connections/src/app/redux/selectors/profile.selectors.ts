@@ -1,4 +1,3 @@
-/* eslint-disable operator-linebreak */
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 
 import { ProfileState } from "../reducers/profile.reducer";

@@ -55,3 +55,9 @@ export interface PeopleListItem {
     name: string; // user name
     uid: string; // user id
 }
+
+export interface CredentialsData {
+    uid: string | undefined;
+    email: string | undefined;
+    token: string | undefined;
+}

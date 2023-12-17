@@ -24,6 +24,15 @@
         "plugin:@angular-eslint/template/process-inline-templates"
       ],
       "rules": {
+        "no-confusing-arrow": "off",
+        "no-restricted-syntax": "off",
+        "class-methods-use-this": "off",
+        "no-underscore-dangle": "off",
+        "operator-linebreak": "off",
+        "implicit-arrow-linebreak": "off",
+        "object-curly-newline": "off",
+        "arrow-body-style": "off",
+        "function-paren-newline": "off",
         "import/prefer-default-export": "off",
         "import/first": "error",
         "import/newline-after-import": "error",
@@ -44,10 +53,7 @@
             "argsIgnorePattern": "^_"
           }
         ],
-        "@typescript-eslint/indent": [
-          "error",
-          4
-        ],
+        "@typescript-eslint/indent": "off",
         "@typescript-eslint/comma-dangle": "off",
         "@typescript-eslint/lines-between-class-members": "off",
         "@typescript-eslint/quotes": [

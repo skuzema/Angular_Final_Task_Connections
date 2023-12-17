@@ -1,10 +1,13 @@
-/* eslint-disable function-paren-newline */
-/* eslint-disable implicit-arrow-linebreak */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable object-curly-newline */
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, catchError, map, Observable, tap } from "rxjs";
+import {
+    BehaviorSubject,
+    catchError,
+    filter,
+    map,
+    Observable,
+    tap,
+} from "rxjs";
 
 import {
     GroupID,
@@ -48,6 +51,7 @@ export class DataService {
         return this.http.post<LoginResponseData>(url, data).pipe(
             tap(
                 (response) => {
+                    console.log("login service success:", response);
                     const castedResponse: Response = {
                         type: "",
                         message: "",
@@ -62,6 +66,7 @@ export class DataService {
                     this.response.next(castedResponse);
                 },
                 (error) => {
+                    console.log("login service error:", error);
                     const castedError: Response = error;
                     this.response.next(castedError);
                 }

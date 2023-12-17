@@ -1,5 +1,4 @@
-/* eslint-disable operator-linebreak */
-/* eslint-disable no-underscore-dangle */
+import { HttpErrorResponse } from "@angular/common/http";
 import { Component } from "@angular/core";
 import {
     FormBuilder,
@@ -14,10 +13,17 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { Router } from "@angular/router";
+import { Store } from "@ngrx/store";
+import { Observable, skip, take } from "rxjs";
 
 import { SnackbarComponent } from "../../core/components/snackbar/snackbar.component";
-import { DataService } from "../../core/services/data.service";
-import { LoginData, SnackType } from "../../shared/models/data";
+import * as LoginActions from "../../redux/actions/login.actions";
+import * as LoginSelectors from "../../redux/selectors/login.selectors";
+import {
+    LoginData,
+    LoginResponseData,
+    SnackType,
+} from "../../shared/models/data";
 
 @Component({
     selector: "app-login-page",
@@ -37,6 +43,9 @@ import { LoginData, SnackType } from "../../shared/models/data";
     styleUrl: "./login-page.component.scss",
 })
 export class LoginPageComponent {
+    loginResponse$: Observable<LoginResponseData | null>;
+    loginError$: Observable<HttpErrorResponse | null>;
+
     hide = true;
     isLoading = false;
     notFountError = false;
@@ -52,9 +61,14 @@ export class LoginPageComponent {
     constructor(
         private _formBuilder: FormBuilder,
         private router: Router,
-        private dataService: DataService,
-        public snackBar: SnackbarComponent
-    ) {}
+        public snackBar: SnackbarComponent,
+        private store: Store
+    ) {
+        this.loginResponse$ = this.store.select(
+            LoginSelectors.selectLoginResponse
+        );
+        this.loginError$ = this.store.select(LoginSelectors.selectLoginError);
+    }
 
     getEmailErrorMessage() {
         if (this.email.hasError("required")) {
@@ -81,18 +95,24 @@ export class LoginPageComponent {
             password: this.loginForm.value.password!,
         };
 
-        this.dataService.login(loginData).subscribe(
-            () => {
+        this.store.dispatch(LoginActions.login({ loginData }));
+
+        this.loginResponse$.subscribe((data) => {
+            if (data) {
+                console.log("loginResponse$, data", data);
                 this.isLoading = false;
                 this.snackBar.showSnackbar(
                     "Login successful",
                     SnackType.success
                 );
                 this.router.navigate(["/main"]);
-            },
-            (error) => {
-                this.isLoading = false;
+            }
+        });
 
+        this.loginError$.pipe(skip(1), take(1)).subscribe((error) => {
+            if (error) {
+                console.log("loginError$, data", error);
+                this.isLoading = false;
                 if (
                     error.status === 400 &&
                     error.error.type === "NotFoundException"
@@ -109,7 +129,7 @@ export class LoginPageComponent {
                     this.snackBar.showSnackbar(msg, SnackType.error);
                 }
             }
-        );
+        });
     }
 
     onFieldChange() {

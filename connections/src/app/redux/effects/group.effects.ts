@@ -1,24 +1,39 @@
-/* eslint-disable arrow-body-style */
-/* eslint-disable object-curly-newline */
-/* eslint-disable implicit-arrow-linebreak */
-/* eslint-disable function-paren-newline */
 import { Injectable } from "@angular/core";
-import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { Actions, concatLatestFrom, createEffect, ofType } from "@ngrx/effects";
 import { Store } from "@ngrx/store";
 import { of } from "rxjs";
-import { catchError, map, mergeMap } from "rxjs/operators";
+import { catchError, exhaustMap, filter, map, mergeMap } from "rxjs/operators";
 
 import { DataService } from "../../core/services/data.service";
 import * as groupActions from "../actions/group.actions";
+import { selectGroups } from "../selectors/group.selectors";
 
 @Injectable()
 export class GroupEffects {
     loadGroups$ = createEffect(() => {
         return this.actions$.pipe(
             ofType(groupActions.loadGroups),
-            mergeMap(() =>
+            concatLatestFrom(() => {
+                console.log(
+                    "GroupEffects, selectGroups:",
+                    !!this.store.select(selectGroups)
+                );
+                return this.store.select(selectGroups);
+            }),
+            filter(([, loaded]) => {
+                console.log(
+                    "GroupEffects filter loaded: ",
+                    Object.keys(loaded).length === 0,
+                    loaded
+                );
+                return Object.keys(loaded).length === 0;
+            }),
+            exhaustMap(() =>
                 this.dataService.getGroups().pipe(
-                    map((groups) => groupActions.loadGroupsSuccess({ groups })),
+                    map((groups) => {
+                        console.log("getGroups success", groups);
+                        return groupActions.loadGroupsSuccess({ groups });
+                    }),
                     catchError((error) =>
                         of(groupActions.loadGroupsFailure({ error }))
                     )

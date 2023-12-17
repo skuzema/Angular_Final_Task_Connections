@@ -1,7 +1,3 @@
-/* eslint-disable arrow-body-style */
-/* eslint-disable object-curly-newline */
-/* eslint-disable implicit-arrow-linebreak */
-/* eslint-disable function-paren-newline */
 import { Injectable } from "@angular/core";
 import { Actions, concatLatestFrom, createEffect, ofType } from "@ngrx/effects";
 import { Store } from "@ngrx/store";
@@ -31,8 +27,7 @@ export class ProfileEffects {
                 );
                 return this.store.select(selectUserProfile);
             }),
-            filter(([payload, loaded]) => {
-                console.log("filter payload: ", !payload, payload);
+            filter(([, loaded]) => {
                 console.log("filter loaded: ", !loaded, loaded);
                 return !loaded;
             }),
