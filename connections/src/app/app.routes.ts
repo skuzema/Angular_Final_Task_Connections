@@ -37,5 +37,14 @@ export const routes: Routes = [
                 (m) => m.LoginPageComponent
             ),
     },
+    {
+        path: "group/:groupID",
+        loadComponent: () =>
+            import("./pages/group-dialog-page/group-dialog-page.component").then(
+                (m) => m.GroupDialogPageComponent
+            ),
+            canLoad: [AuthGuard],
+            canActivate: [AuthGuard],
+    },
     { path: "**", component: NotFoundPageComponent },
 ];

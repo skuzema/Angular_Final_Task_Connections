@@ -6,7 +6,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatListModule } from "@angular/material/list";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { Store } from "@ngrx/store";
-import { Observable, skip, take } from "rxjs";
+import { Observable, catchError, of, skip, switchMap, take } from "rxjs";
 
 import { SnackbarComponent } from "../../../../core/components/snackbar/snackbar.component";
 import * as groupActions from "../../../../redux/actions/group.actions";
@@ -54,6 +54,9 @@ export class GroupListComponent implements OnInit {
 
     ngOnInit() {
         this.store.dispatch(groupActions.loadGroups());
+        console.log("ngOnInit");
+
+        this.error$.pipe(skip(1), take(1)).subscribe((error) => this.showErrorMessage(error));
     }
 
     onUpdateClick() {
@@ -74,41 +77,81 @@ export class GroupListComponent implements OnInit {
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 this.groupName = result;
-                console.log("The dialog was closed:", this.groupName);
                 this.store.dispatch(
                     groupActions.createGroup({ name: this.groupName })
                 );
 
-                this.groups$.subscribe((data) => {
-                    if (data) {
-                        console.log("loginResponse$, data", data);
-                        this.snackBar.showSnackbar(
-                            "Login successful",
-                            SnackType.success
-                        );
-                    }
-                });
+                this.groups$ 
+                    .pipe(
+                        switchMap(() => this.groups$),
+                        switchMap((groups) => {
+                            // return of(groups);
+                            return this.groups$.pipe(skip(1), take(1));
+                        }),
+                        catchError((error) => { 
+                            this.showErrorMessage(error);
+                            return of(error);
+                        }))
+                        .subscribe((groups) => {
+                            if (groups) {
+                                this.snackBar.showSnackbar(
+                                    "User group created successfully.",
+                                    SnackType.success
+                                );
+                                this.store.dispatch(groupActions.loadGroups());
+                            }
+                        });
 
-                this.error$.pipe(skip(1), take(1)).subscribe((error) => {
-                    if (error) {
-                        console.log("loginError$, data", error);
-                        if (
-                            error.status === 400 &&
-                            error.error.type === "NotFoundException"
-                        ) {
-                            this.snackBar.showSnackbar(
-                                error.error.message,
-                                SnackType.error
-                            );
-                        } else {
-                            const msg = error.error.message
-                                ? error.error.message
-                                : "Network error";
-                            this.snackBar.showSnackbar(msg, SnackType.error);
-                        }
-                    }
-                });
+                // this.groups$.subscribe((data) => {
+                //     if (data) {
+                //         console.log("Create Group, groups$:", data);
+                //         this.snackBar.showSnackbar(
+                //             "Login successful",
+                //             SnackType.success
+                //         );
+                //     }
+                // });
+
+                // this.error$.pipe(skip(1), take(1)).subscribe((error) => {
+                //     if (error) {
+                //         console.log("Create Group, error$", error);
+                //         if (
+                //             error.status === 400 &&
+                //             error.error.type === "NotFoundException"
+                //         ) {
+                //             this.snackBar.showSnackbar(
+                //                 error.error.message,
+                //                 SnackType.error
+                //             );
+                //         } else {
+                //             const msg = error.error.message
+                //                 ? error.error.message
+                //                 : "Network error";
+                //             this.snackBar.showSnackbar(msg, SnackType.error);
+                //         }
+                //     }
+                // });
             }
         });
+    }
+
+    showErrorMessage(error: any) {
+        if (error) {
+            console.log("Load Group, error$", error);
+            if (
+                error.status === 400 &&
+                error.error.type === "NotFoundException"
+            ) {
+                this.snackBar.showSnackbar(
+                    error.error.message,
+                    SnackType.error
+                );
+            } else {
+                const msg = error.error.message
+                    ? error.error.message
+                    : "Network error";
+                this.snackBar.showSnackbar(msg, SnackType.error);
+            }
+        }
     }
 }
