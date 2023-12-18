@@ -75,9 +75,8 @@ export class AuthInterceptor implements HttpInterceptor {
                         "rs-uid": storeCredentials?.uid || credentials.uid,
                         "rs-email":
                             storeCredentials?.email || credentials.email,
-                        Authorization: `Bearer ${
-                            storeCredentials?.token || credentials.token
-                        }`,
+                        Authorization: `Bearer ${storeCredentials?.token || credentials.token}`,
+                        "Content-Type": "application/json",
                     },
                 });
 

@@ -33,7 +33,7 @@ export class GroupEffects {
             exhaustMap(() =>
                 this.dataService.getGroups().pipe(
                     map((groups) => {
-                        console.log("getGroups success", groups);
+                        // console.log("getGroups success", groups);
                         return groupActions.loadGroupsSuccess({ groups });
                     }),
                     catchError((error) =>
