@@ -6,17 +6,16 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatListModule } from "@angular/material/list";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { Store } from "@ngrx/store";
-import { Observable, catchError, of, skip, switchMap, take } from "rxjs";
+import { catchError, Observable, of, switchMap, take } from "rxjs";
 
 import { SnackbarComponent } from "../../../../core/components/snackbar/snackbar.component";
 import * as groupActions from "../../../../redux/actions/group.actions";
 import * as groupSelectors from "../../../../redux/selectors/group.selectors";
+import * as loginSelectors from "../../../../redux/selectors/login.selectors";
 import { GroupListData, SnackType } from "../../../../shared/models/data";
 import { SortByDatePipe } from "../../../../shared/pipes/sort-by-date.pipe";
-import { NewGroupComponent } from "../new-group/new-group.component";
-import * as loginSelectors from "../../../../redux/selectors/login.selectors";
 import { DeleteDialogComponent } from "../delete-dialog/delete-dialog.component";
-
+import { NewGroupComponent } from "../new-group/new-group.component";
 
 @Component({
     selector: "app-group-list",
@@ -78,11 +77,11 @@ export class GroupListComponent implements OnInit {
             if (result) {
                 this.store.dispatch(groupActions.deleteGroup({ groupId }));
 
-                this.groups$ 
+                this.groups$
                     .pipe(
                         switchMap(() => this.groups$),
                         switchMap((groups) => this.groups$.pipe(take(1))),
-                        catchError((error) => { 
+                        catchError((error) => {
                             console.log("delete error");
                             this.showErrorMessage(error);
                             return of(error);
@@ -109,11 +108,11 @@ export class GroupListComponent implements OnInit {
                     groupActions.createGroup({ name: this.groupName })
                 );
 
-                this.groups$ 
+                this.groups$
                 .pipe(
                     switchMap(() => this.groups$),
                     switchMap((groups) => this.groups$.pipe(take(1))),
-                    catchError((error) => { 
+                    catchError((error) => {
                         console.log("create error");
                         this.showErrorMessage(error);
                         return of(error);
@@ -125,7 +124,7 @@ export class GroupListComponent implements OnInit {
                     );
                 });
 
-                // this.groups$ 
+                // this.groups$
                 //     .pipe(
                 //         switchMap(() => this.groups$),
                 //         switchMap((groups) => {
@@ -133,7 +132,7 @@ export class GroupListComponent implements OnInit {
                 //             return this.groups$.pipe(skip(1), take(1));
                 //             // return this.groups$.pipe(take(1));
                 //         }),
-                //         catchError((error) => { 
+                //         catchError((error) => {
                 //             this.showErrorMessage(error);
                 //             return of(error);
                 //         }))

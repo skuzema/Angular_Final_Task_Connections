@@ -1,9 +1,7 @@
-import { Component } from '@angular/core';
-import {MatIconModule} from '@angular/material/icon';
-import { AbstractControl, FormControl, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
+import { Component } from "@angular/core";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import {
-    MAT_DIALOG_DATA,
     MatDialogActions,
     MatDialogClose,
     MatDialogContent,
@@ -11,10 +9,11 @@ import {
     MatDialogTitle,
 } from "@angular/material/dialog";
 import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 
 @Component({
-  selector: 'app-delete-dialog',
+  selector: "app-delete-dialog",
   standalone: true,
   imports: [
     MatIconModule,
@@ -28,12 +27,11 @@ import { MatInputModule } from "@angular/material/input";
     MatDialogActions,
     MatDialogClose,
   ],
-  templateUrl: './delete-dialog.component.html',
-  styleUrl: './delete-dialog.component.scss'
+  templateUrl: "./delete-dialog.component.html",
+  styleUrl: "./delete-dialog.component.scss"
 })
 export class DeleteDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<DeleteDialogComponent>,
 ) {}
-
 }

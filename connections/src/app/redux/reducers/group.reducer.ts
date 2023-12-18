@@ -68,7 +68,7 @@ export const groupReducer = createReducer(
             ...state.groups,
             Items: state.groups?.Items?.filter((g) => g.id !== groupId) || [],
         };
-    
+
         return {
             ...state,
             groups: updatedGroups,

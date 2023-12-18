@@ -39,7 +39,7 @@ export class NewGroupComponent {
         @Inject(MAT_DIALOG_DATA) public data: DialogData
     ) {}
 
-    groupName = new FormControl('', [Validators.required, this.groupNameValidator]);
+    groupName = new FormControl("", [Validators.required, this.groupNameValidator]);
 
     getGroupNameErrorMessage() {
         if (this.groupName.hasError("required")) {
@@ -50,7 +50,7 @@ export class NewGroupComponent {
         }
         return "";
     }
-    
+
     private groupNameValidator(
         control: AbstractControl
     ): { [key: string]: boolean } | null {
