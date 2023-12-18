@@ -4,10 +4,12 @@ import { createAction, props } from "@ngrx/store";
 import { GroupListData, GroupListItem } from "../../shared/models/data";
 
 export const loadGroups = createAction("[Group] Load Groups");
+
 export const loadGroupsSuccess = createAction(
     "[Group] Load Groups Success",
     props<{ groups: GroupListData }>()
 );
+
 export const loadGroupsFailure = createAction(
     "[Group] Load Groups Failure",
     props<{ error: HttpErrorResponse }>()
@@ -41,4 +43,24 @@ export const deleteGroupSuccess = createAction(
 export const deleteGroupFailure = createAction(
     "[Group] Delete Group Failure",
     props<{ error: HttpErrorResponse }>()
+);
+
+export const updateGroups = createAction("[Group] Update Groups");
+
+export const updateGroupsSuccess = createAction(
+    "[Group] Update Groups Success",
+    props<{ groups: GroupListData }>()
+);
+
+export const updateGroupsFailure = createAction(
+    "[Group] Update Groups Failure",
+    props<{ error: HttpErrorResponse }>()
+);
+
+export const setNextGroupUpdateTime = createAction(
+    "[Group] Set Next Group Update Time"
+);
+
+export const decrementNextGroupUpdateTime = createAction(
+    "[Group] Decrement Next Group Update Time"
 );

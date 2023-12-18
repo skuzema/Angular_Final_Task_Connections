@@ -3,11 +3,11 @@
         <h2>Group list</h2>
     </div>
     <div class="group-buttons">
-        <div class="group-countdown">
-            <span>Next update after: {{ updateCountdown }}</span>
+        <div class="group-countdown" *ngIf="isUpdateDisabled !== false">
+            <span>Next update after: {{ updateCountdown }} seconds</span>
         </div>
-        <div>
-            <button mat-flat-button color="warn" [disabled]="isUpdateDisabled" (click)="onUpdateClick()">
+        <div class="group-operations">
+            <button mat-flat-button color="warn" [disabled]="isUpdateDisabled" (click)="onUpdateGroup()">
                 Update
             </button>
             <button mat-flat-button color="primary" (click)="openNewGroupDialog()">Create Group</button>
@@ -21,7 +21,7 @@
                 <a mat-list-item href="/group/{{group.id}}" >
                     <div matListItemTitle>{{ group.name }}</div>
                     <div matListItemLine>{{ group.createdAt | date:'short'}}</div>
-                    <button mat-icon-button 
+                    <button mat-icon-button
                         *ngIf="group.createdBy === (currentUserUID$ | async)"
                         (click)="onDeleteClick($event, group.id)" matListItemMeta>
                         <mat-icon>delete</mat-icon>

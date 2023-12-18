@@ -8,12 +8,14 @@ export interface GroupState {
     groups: GroupListData;
     loading: boolean;
     error: any;
+    nextGroupUpdateTime: number | null;
 }
 
 export const initialState: GroupState = {
     groups: {},
     loading: false,
     error: null,
+    nextGroupUpdateTime: null,
 };
 
 export const groupReducer = createReducer(
@@ -57,7 +59,6 @@ export const groupReducer = createReducer(
         loading: false,
         error,
     })),
-
     on(GroupActions.deleteGroup, (state) => ({
         ...state,
         loading: true,
@@ -68,7 +69,6 @@ export const groupReducer = createReducer(
             ...state.groups,
             Items: state.groups?.Items?.filter((g) => g.id !== groupId) || [],
         };
-
         return {
             ...state,
             groups: updatedGroups,
@@ -79,5 +79,32 @@ export const groupReducer = createReducer(
         ...state,
         loading: false,
         error,
+    })),
+    on(GroupActions.updateGroups, (state) => ({
+        ...state,
+        loading: true,
+        error: null,
+    })),
+    on(GroupActions.updateGroupsSuccess, (state, { groups }) => ({
+        ...state,
+        groups,
+        loading: false,
+        error: null,
+    })),
+    on(GroupActions.updateGroupsFailure, (state, { error }) => ({
+        ...state,
+        groups: {},
+        loading: false,
+        error,
+    })),
+    on(GroupActions.setNextGroupUpdateTime, (state) => ({
+        ...state,
+        nextGroupUpdateTime: 60,
+    })),
+    on(GroupActions.decrementNextGroupUpdateTime, (state) => ({
+        ...state,
+        nextGroupUpdateTime: state.nextGroupUpdateTime
+            ? state.nextGroupUpdateTime - 1
+            : 0,
     }))
 );

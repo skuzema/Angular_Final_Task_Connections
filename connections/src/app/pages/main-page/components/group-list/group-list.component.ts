@@ -1,12 +1,23 @@
 import { CommonModule } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatDialog } from "@angular/material/dialog";
 import { MatIconModule } from "@angular/material/icon";
 import { MatListModule } from "@angular/material/list";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { Store } from "@ngrx/store";
-import { catchError, Observable, of, switchMap, take } from "rxjs";
+import {
+    distinctUntilChanged,
+    interval,
+    map,
+    Observable,
+    skip,
+    Subscription,
+    take,
+    takeUntil,
+    takeWhile,
+    timer,
+} from "rxjs";
 
 import { SnackbarComponent } from "../../../../core/components/snackbar/snackbar.component";
 import * as groupActions from "../../../../redux/actions/group.actions";
@@ -28,21 +39,26 @@ import { NewGroupComponent } from "../new-group/new-group.component";
         MatIconModule,
         SortByDatePipe,
         NewGroupComponent,
-        DeleteDialogComponent
+        DeleteDialogComponent,
     ],
     providers: [SnackbarComponent],
     templateUrl: "./group-list.component.html",
     styleUrl: "./group-list.component.scss",
 })
-export class GroupListComponent implements OnInit {
+export class GroupListComponent implements OnInit, OnDestroy {
     groups$: Observable<GroupListData>;
     loading$: Observable<boolean>;
     error$: Observable<any>;
     currentUserUID$: Observable<string | undefined>;
+    nextGroupUpdateTime$: Observable<number | null>;
 
     updateCountdown: number | null = null;
     isUpdateDisabled = false;
     groupName: string;
+
+    timer$!: Observable<number>;
+
+    private timerSubscription: Subscription | undefined;
 
     constructor(
         private store: Store,
@@ -53,19 +69,75 @@ export class GroupListComponent implements OnInit {
         this.loading$ = store.select(groupSelectors.selectLoading);
         this.error$ = store.select(groupSelectors.selectError);
         this.currentUserUID$ = store.select(loginSelectors.selectUid);
-
+        this.nextGroupUpdateTime$ = store.select(
+            groupSelectors.selectNextGroupUpdateTime
+        );
         this.groupName = "";
     }
 
-    ngOnInit() {
-        this.store.dispatch(groupActions.loadGroups());
-        console.log("ngOnInit");
-
-        // this.error$.pipe(skip(1), take(1)).subscribe((error) => this.showErrorMessage(error));
+    startTimer() {
+        this.timer$ = timer(0, 1000).pipe(takeUntil(this.nextGroupUpdateTime$));
     }
 
-    onUpdateClick() {
+    ngOnDestroy(): void {
+        console.log("Group List, ngOnDestroy");
+        if (this.timerSubscription) {
+            this.timerSubscription.unsubscribe();
+        }
+    }
+
+    ngOnInit() {
+        console.log("Group List, ngOnInit");
+        this.nextGroupUpdateTime$.pipe(take(1)).subscribe((count) => {
+            this.isUpdateDisabled = !!count;
+            console.log(
+                "counter, count, this.isUpdateDisabled:",
+                count,
+                this.isUpdateDisabled
+            );
+        });
+
         this.store.dispatch(groupActions.loadGroups());
+        this.error$
+            .pipe(skip(1), take(1))
+            .subscribe((error) => this.showErrorMessage(error));
+    }
+
+    onUpdateGroup() {
+        this.store.dispatch(groupActions.updateGroups());
+        this.error$
+            .pipe(take(1))
+            .subscribe((error) => this.showErrorMessage(error));
+
+        this.groups$.pipe(take(1)).subscribe((groups) => {
+            if (groups) {
+                this.store.dispatch(groupActions.setNextGroupUpdateTime());
+
+                if (this.timerSubscription) {
+                    this.timerSubscription.unsubscribe();
+                }
+
+                this.timerSubscription = interval(1000)
+                    .pipe(
+                        takeWhile(() => this.updateCountdown !== 0),
+                        map(() =>
+                            this.updateCountdown ? this.updateCountdown - 1 : 0
+                        ),
+                        distinctUntilChanged()
+                    )
+                    .subscribe((countdown) => {
+                        this.updateCountdown = countdown;
+                        this.isUpdateDisabled = true;
+
+                        if (this.updateCountdown === 0) {
+                            this.isUpdateDisabled = false;
+                            this.store.dispatch(
+                                groupActions.decrementNextGroupUpdateTime()
+                            );
+                        }
+                    });
+            }
+        });
     }
 
     onDeleteClick(event: Event, groupId: string) {
@@ -77,23 +149,20 @@ export class GroupListComponent implements OnInit {
             if (result) {
                 this.store.dispatch(groupActions.deleteGroup({ groupId }));
 
-                this.groups$
-                    .pipe(
-                        switchMap(() => this.groups$),
-                        switchMap((groups) => this.groups$.pipe(take(1))),
-                        catchError((error) => {
-                            console.log("delete error");
-                            this.showErrorMessage(error);
-                            return of(error);
-                    }))
-                    .subscribe(() => {
+                this.error$
+                    .pipe(take(1))
+                    .subscribe((error) => this.showErrorMessage(error));
+
+                this.groups$.pipe(take(1)).subscribe((group) => {
+                    if (group) {
                         this.snackBar.showSnackbar(
                             "Group deleted successfully!",
                             SnackType.success
                         );
-                    });
+                    }
+                });
             }
-         });
+        });
     }
 
     openNewGroupDialog(): void {
@@ -108,42 +177,18 @@ export class GroupListComponent implements OnInit {
                     groupActions.createGroup({ name: this.groupName })
                 );
 
-                this.groups$
-                .pipe(
-                    switchMap(() => this.groups$),
-                    switchMap((groups) => this.groups$.pipe(take(1))),
-                    catchError((error) => {
-                        console.log("create error");
-                        this.showErrorMessage(error);
-                        return of(error);
-                }))
-                .subscribe(() => {
-                    this.snackBar.showSnackbar(
-                        "Group created successfully!",
-                        SnackType.success
-                    );
-                });
+                this.error$
+                    .pipe(take(1))
+                    .subscribe((error) => this.showErrorMessage(error));
 
-                // this.groups$
-                //     .pipe(
-                //         switchMap(() => this.groups$),
-                //         switchMap((groups) => {
-                //             // return of(groups);
-                //             return this.groups$.pipe(skip(1), take(1));
-                //             // return this.groups$.pipe(take(1));
-                //         }),
-                //         catchError((error) => {
-                //             this.showErrorMessage(error);
-                //             return of(error);
-                //         }))
-                //         .subscribe((groups) => {
-                //             if (groups) {
-                //                 this.snackBar.showSnackbar(
-                //                     "User group created successfully.",
-                //                     SnackType.success
-                //                 );
-                //             }
-                //         });
+                this.groups$.pipe(take(1)).subscribe((group) => {
+                    if (group) {
+                        this.snackBar.showSnackbar(
+                            "Group created successfully!",
+                            SnackType.success
+                        );
+                    }
+                });
             }
         });
     }

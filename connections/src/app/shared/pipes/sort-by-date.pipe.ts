@@ -29,7 +29,7 @@ export class SortByDatePipe implements PipeTransform {
             }
             return 0;
         });
-        console.log("pipe, sortedItems", sortedItems);
+
         return {
             ...groups,
             Items: sortedItems,

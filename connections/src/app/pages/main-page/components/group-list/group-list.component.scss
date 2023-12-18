@@ -13,7 +13,7 @@
 .group-buttons {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: flex-end;
 
     button {
         margin-left: 10px;
@@ -29,3 +29,4 @@
     overflow: auto;
     max-height: 70vh;
 }
+

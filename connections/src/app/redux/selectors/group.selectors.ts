@@ -16,3 +16,7 @@ export const selectError = createSelector(
     selectGroupState,
     (state) => state.error
 );
+export const selectNextGroupUpdateTime = createSelector(
+    selectGroupState,
+    (state) => state.nextGroupUpdateTime
+);

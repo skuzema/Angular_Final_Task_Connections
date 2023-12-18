@@ -45,22 +45,11 @@ export class AuthInterceptor implements HttpInterceptor {
                     token: "",
                 };
 
-                console.log(
-                    "AuthInterceptor, uid:",
-                    storeCredentials,
-                    !storeCredentials?.uid ||
-                        !storeCredentials?.email ||
-                        !storeCredentials?.token
-                );
                 if (
                     !storeCredentials?.uid ||
                     !storeCredentials?.email ||
                     !storeCredentials?.token
                 ) {
-                    console.log(
-                        "AuthInterceptor, setup:",
-                        this.credentials.uid
-                    );
                     credentials = {
                         uid: this.credentials.uid!,
                         email: this.credentials.email!,
@@ -75,7 +64,9 @@ export class AuthInterceptor implements HttpInterceptor {
                         "rs-uid": storeCredentials?.uid || credentials.uid,
                         "rs-email":
                             storeCredentials?.email || credentials.email,
-                        Authorization: `Bearer ${storeCredentials?.token || credentials.token}`,
+                        Authorization: `Bearer ${
+                            storeCredentials?.token || credentials.token
+                        }`,
                         "Content-Type": "application/json",
                     },
                 });

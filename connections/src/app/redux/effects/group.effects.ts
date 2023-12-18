@@ -15,25 +15,11 @@ export class GroupEffects {
     loadGroups$ = createEffect(() => {
         return this.actions$.pipe(
             ofType(groupActions.loadGroups),
-            concatLatestFrom(() => {
-                console.log(
-                    "GroupEffects, selectGroups:",
-                    !!this.store.select(selectGroups)
-                );
-                return this.store.select(selectGroups);
-            }),
-            filter(([, loaded]) => {
-                console.log(
-                    "GroupEffects filter loaded: ",
-                    Object.keys(loaded).length === 0,
-                    loaded
-                );
-                return Object.keys(loaded).length === 0;
-            }),
+            concatLatestFrom(() => this.store.select(selectGroups)),
+            filter(([, loaded]) => Object.keys(loaded).length === 0),
             exhaustMap(() =>
                 this.dataService.getGroups().pipe(
                     map((groups) => {
-                        // console.log("getGroups success", groups);
                         return groupActions.loadGroupsSuccess({ groups });
                     }),
                     catchError((error) =>
@@ -78,6 +64,22 @@ export class GroupEffects {
                     map(() => groupActions.deleteGroupSuccess({ groupId })),
                     catchError((error) =>
                         of(groupActions.deleteGroupFailure({ error }))
+                    )
+                )
+            )
+        );
+    });
+
+    updateGroups$ = createEffect(() => {
+        return this.actions$.pipe(
+            ofType(groupActions.updateGroups),
+            exhaustMap(() =>
+                this.dataService.getGroups().pipe(
+                    map((groups) => {
+                        return groupActions.updateGroupsSuccess({ groups });
+                    }),
+                    catchError((error) =>
+                        of(groupActions.updateGroupsFailure({ error }))
                     )
                 )
             )
