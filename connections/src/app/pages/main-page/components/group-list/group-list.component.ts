@@ -101,36 +101,6 @@ export class GroupListComponent implements OnInit {
                                 this.store.dispatch(groupActions.loadGroups());
                             }
                         });
-
-                // this.groups$.subscribe((data) => {
-                //     if (data) {
-                //         console.log("Create Group, groups$:", data);
-                //         this.snackBar.showSnackbar(
-                //             "Login successful",
-                //             SnackType.success
-                //         );
-                //     }
-                // });
-
-                // this.error$.pipe(skip(1), take(1)).subscribe((error) => {
-                //     if (error) {
-                //         console.log("Create Group, error$", error);
-                //         if (
-                //             error.status === 400 &&
-                //             error.error.type === "NotFoundException"
-                //         ) {
-                //             this.snackBar.showSnackbar(
-                //                 error.error.message,
-                //                 SnackType.error
-                //             );
-                //         } else {
-                //             const msg = error.error.message
-                //                 ? error.error.message
-                //                 : "Network error";
-                //             this.snackBar.showSnackbar(msg, SnackType.error);
-                //         }
-                //     }
-                // });
             }
         });
     }

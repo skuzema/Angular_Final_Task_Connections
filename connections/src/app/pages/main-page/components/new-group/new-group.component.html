@@ -1,11 +1,14 @@
 <h1 mat-dialog-title>Create new group</h1>
-<div mat-dialog-content>
+<div mat-dialog-content class="new-group-container">
   <mat-form-field>
     <mat-label>New group name</mat-label>
-    <input matInput [(ngModel)]="data.groupName">
+    <input matInput [(ngModel)]="data.groupName" [formControl]="groupName" required>
+    @if (groupName.invalid) {
+      <mat-error>{{ getGroupNameErrorMessage() }}</mat-error>
+    }
   </mat-form-field>
 </div>
 <div mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="data.groupName" cdkFocusInitial>Ok</button>
+  <button mat-button [mat-dialog-close]="data.groupName" cdkFocusInitial [disabled]="groupName.invalid">Ok</button>
   <button mat-button (click)="cancel()">Cancel</button>
 </div>
