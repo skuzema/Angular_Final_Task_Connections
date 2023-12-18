@@ -15,6 +15,7 @@ import { GroupListData, SnackType } from "../../../../shared/models/data";
 import { SortByDatePipe } from "../../../../shared/pipes/sort-by-date.pipe";
 import { NewGroupComponent } from "../new-group/new-group.component";
 import * as loginSelectors from "../../../../redux/selectors/login.selectors";
+import { DeleteDialogComponent } from "../delete-dialog/delete-dialog.component";
 
 
 @Component({
@@ -28,6 +29,7 @@ import * as loginSelectors from "../../../../redux/selectors/login.selectors";
         MatIconModule,
         SortByDatePipe,
         NewGroupComponent,
+        DeleteDialogComponent
     ],
     providers: [SnackbarComponent],
     templateUrl: "./group-list.component.html",
@@ -60,7 +62,7 @@ export class GroupListComponent implements OnInit {
         this.store.dispatch(groupActions.loadGroups());
         console.log("ngOnInit");
 
-        this.error$.pipe(skip(1), take(1)).subscribe((error) => this.showErrorMessage(error));
+        // this.error$.pipe(skip(1), take(1)).subscribe((error) => this.showErrorMessage(error));
     }
 
     onUpdateClick() {
@@ -70,8 +72,29 @@ export class GroupListComponent implements OnInit {
     onDeleteClick(event: Event, groupId: string) {
         event.preventDefault();
         console.log("groupId:", groupId);
-        
-        // this.store.dispatch(groupActions.deleteGroup({ groupId }));
+        const dialogRef = this.dialog.open(DeleteDialogComponent);
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.store.dispatch(groupActions.deleteGroup({ groupId }));
+
+                this.groups$ 
+                    .pipe(
+                        switchMap(() => this.groups$),
+                        switchMap((groups) => this.groups$.pipe(take(1))),
+                        catchError((error) => { 
+                            console.log("delete error");
+                            this.showErrorMessage(error);
+                            return of(error);
+                    }))
+                    .subscribe(() => {
+                        this.snackBar.showSnackbar(
+                            "Group deleted successfully!",
+                            SnackType.success
+                        );
+                    });
+            }
+         });
     }
 
     openNewGroupDialog(): void {
@@ -87,25 +110,41 @@ export class GroupListComponent implements OnInit {
                 );
 
                 this.groups$ 
-                    .pipe(
-                        switchMap(() => this.groups$),
-                        switchMap((groups) => {
-                            // return of(groups);
-                            return this.groups$.pipe(skip(1), take(1));
-                        }),
-                        catchError((error) => { 
-                            this.showErrorMessage(error);
-                            return of(error);
-                        }))
-                        .subscribe((groups) => {
-                            if (groups) {
-                                this.snackBar.showSnackbar(
-                                    "User group created successfully.",
-                                    SnackType.success
-                                );
-                                // this.store.dispatch(groupActions.loadGroups());
-                            }
-                        });
+                .pipe(
+                    switchMap(() => this.groups$),
+                    switchMap((groups) => this.groups$.pipe(take(1))),
+                    catchError((error) => { 
+                        console.log("create error");
+                        this.showErrorMessage(error);
+                        return of(error);
+                }))
+                .subscribe(() => {
+                    this.snackBar.showSnackbar(
+                        "Group created successfully!",
+                        SnackType.success
+                    );
+                });
+
+                // this.groups$ 
+                //     .pipe(
+                //         switchMap(() => this.groups$),
+                //         switchMap((groups) => {
+                //             // return of(groups);
+                //             return this.groups$.pipe(skip(1), take(1));
+                //             // return this.groups$.pipe(take(1));
+                //         }),
+                //         catchError((error) => { 
+                //             this.showErrorMessage(error);
+                //             return of(error);
+                //         }))
+                //         .subscribe((groups) => {
+                //             if (groups) {
+                //                 this.snackBar.showSnackbar(
+                //                     "User group created successfully.",
+                //                     SnackType.success
+                //                 );
+                //             }
+                //         });
             }
         });
     }

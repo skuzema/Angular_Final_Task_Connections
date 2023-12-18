@@ -63,11 +63,18 @@ export const groupReducer = createReducer(
         loading: true,
         error: null,
     })),
-    // on(GroupActions.deleteGroupSuccess, (state, { groupId }) => ({
-    //     ...state,
-    //     groups: state.groups.filter((g) => g.id !== groupId),
-    //     loading: false,
-    // })),
+    on(GroupActions.deleteGroupSuccess, (state, { groupId }) => {
+        const updatedGroups: GroupListData = {
+            ...state.groups,
+            Items: state.groups?.Items?.filter((g) => g.id !== groupId) || [],
+        };
+    
+        return {
+            ...state,
+            groups: updatedGroups,
+            loading: false,
+        };
+    }),
     on(GroupActions.deleteGroupFailure, (state, { error }) => ({
         ...state,
         loading: false,
