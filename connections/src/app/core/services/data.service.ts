@@ -140,8 +140,9 @@ export class DataService {
 
     createGroup(name: string): Observable<GroupID> {
         const url = `${this.apiUrl}/groups/create`;
+        const nameObj = `{ "name": "${name}"}`;
 
-        return this.http.post<GroupID>(url, name).pipe(
+        return this.http.post<GroupID>(url, nameObj).pipe(
             tap(
                 (response: any) => {
                     console.log("createGroup, success:", response);
