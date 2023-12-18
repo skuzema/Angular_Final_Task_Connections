@@ -14,6 +14,8 @@ import * as groupSelectors from "../../../../redux/selectors/group.selectors";
 import { GroupListData, SnackType } from "../../../../shared/models/data";
 import { SortByDatePipe } from "../../../../shared/pipes/sort-by-date.pipe";
 import { NewGroupComponent } from "../new-group/new-group.component";
+import * as loginSelectors from "../../../../redux/selectors/login.selectors";
+
 
 @Component({
     selector: "app-group-list",
@@ -35,6 +37,7 @@ export class GroupListComponent implements OnInit {
     groups$: Observable<GroupListData>;
     loading$: Observable<boolean>;
     error$: Observable<any>;
+    currentUserUID$: Observable<string | undefined>;
 
     updateCountdown: number | null = null;
     isUpdateDisabled = false;
@@ -48,6 +51,7 @@ export class GroupListComponent implements OnInit {
         this.groups$ = store.select(groupSelectors.selectGroups);
         this.loading$ = store.select(groupSelectors.selectLoading);
         this.error$ = store.select(groupSelectors.selectError);
+        this.currentUserUID$ = store.select(loginSelectors.selectUid);
 
         this.groupName = "";
     }
@@ -66,6 +70,7 @@ export class GroupListComponent implements OnInit {
     onDeleteClick(event: Event, groupId: string) {
         event.preventDefault();
         console.log("groupId:", groupId);
+        
         // this.store.dispatch(groupActions.deleteGroup({ groupId }));
     }
 
@@ -98,7 +103,7 @@ export class GroupListComponent implements OnInit {
                                     "User group created successfully.",
                                     SnackType.success
                                 );
-                                this.store.dispatch(groupActions.loadGroups());
+                                // this.store.dispatch(groupActions.loadGroups());
                             }
                         });
             }
