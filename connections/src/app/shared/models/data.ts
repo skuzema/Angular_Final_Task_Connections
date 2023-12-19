@@ -37,7 +37,7 @@ export interface GroupListData {
 }
 
 export interface GroupListItem {
-    id: string; 
+    id: string;
     name: string;
     createdAt: string;
     createdBy: string;
@@ -63,7 +63,7 @@ export interface ConversationListData {
 }
 
 export interface ConversationListItem {
-    id?: string; 
+    id?: string;
     companionID?: string;
 }
 

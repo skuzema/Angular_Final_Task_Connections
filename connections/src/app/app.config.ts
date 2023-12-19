@@ -17,13 +17,13 @@ import { provideStoreDevtools } from "@ngrx/store-devtools";
 
 import { routes } from "./app.routes";
 import { GroupEffects } from "./redux/effects/group.effects";
-import { PeopleEffects } from "./redux/effects/people.effects";
 import { LoginEffects } from "./redux/effects/login.effects";
+import { PeopleEffects } from "./redux/effects/people.effects";
 import { ProfileEffects } from "./redux/effects/profile.effects";
 import { duplicatedEmailsReducer } from "./redux/reducers/duplicated-emails.reducer";
 import { groupReducer } from "./redux/reducers/group.reducer";
-import { peopleReducer } from "./redux/reducers/people.reducer";
 import { loginReducer } from "./redux/reducers/login.reducer";
+import { peopleReducer } from "./redux/reducers/people.reducer";
 import { profileReducer } from "./redux/reducers/profile.reducer";
 import { AuthInterceptor } from "./shared/interceptors/auth.interceptor";
 

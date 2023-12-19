@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 
+import { PeopleWithConversation } from "../../shared/models/data";
 import { PeopleState } from "../reducers/people.reducer";
-import { ConversationListItem, PeopleListItem, PeopleWithConversation } from "../../shared/models/data";
 
 const selectPeopleState = createFeatureSelector<PeopleState>("peoples");
 
@@ -39,7 +39,7 @@ export const selectPeopleWithConversation = createSelector(
     if (peoples) {
       for (const person of peoples) {
         const conversationId = state?.conversations?.Items?.find(
-          conversation => conversation.companionID === person.uid
+          (conversation) => conversation.companionID === person.uid
         )?.id;
 
         peopleWithConversation.push({

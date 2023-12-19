@@ -2,13 +2,26 @@ import { Injectable } from "@angular/core";
 import { Actions, concatLatestFrom, createEffect, ofType } from "@ngrx/effects";
 import { Store } from "@ngrx/store";
 import { interval, of } from "rxjs";
-import { catchError, exhaustMap, filter, map, mergeMap, switchMap, takeUntil, tap, withLatestFrom } from "rxjs/operators";
+import {
+    catchError,
+    exhaustMap,
+    filter,
+    map,
+    mergeMap,
+    switchMap,
+    takeUntil,
+    tap,
+    withLatestFrom,
+} from "rxjs/operators";
 
 import { DataService } from "../../core/services/data.service";
-import { ConversationListItem, PeopleListItem } from "../../shared/models/data";
+import { ConversationListItem } from "../../shared/models/data";
 import * as peopleActions from "../actions/people.actions";
-import { selectPeoples, selectNextPeopleUpdateTime, selectStartCounterValue } from "../selectors/people.selectors";
 import * as loginSelectors from "../selectors/login.selectors";
+import {
+    selectNextPeopleUpdateTime,
+    selectPeoples,
+} from "../selectors/people.selectors";
 
 @Injectable()
 export class PeopleEffects {
@@ -54,7 +67,9 @@ export class PeopleEffects {
             exhaustMap(() =>
                 this.dataService.getConversations().pipe(
                     map((conversations) => {
-                        return peopleActions.loadConversationsSuccess({ conversations });
+                        return peopleActions.loadConversationsSuccess({
+                            conversations,
+                        });
                     }),
                     catchError((error) =>
                         of(peopleActions.loadConversationsFailure({ error }))
@@ -70,7 +85,9 @@ export class PeopleEffects {
             exhaustMap(() =>
                 this.dataService.getConversations().pipe(
                     map((conversations) => {
-                        return peopleActions.updateConversationsSuccess({ conversations });
+                        return peopleActions.updateConversationsSuccess({
+                            conversations,
+                        });
                     }),
                     catchError((error) =>
                         of(peopleActions.updateConversationsFailure({ error }))
@@ -84,17 +101,18 @@ export class PeopleEffects {
         return this.actions$.pipe(
             ofType(peopleActions.createConversation),
             concatLatestFrom(() =>
-            this.store.select(loginSelectors.selectLoginResponse)
-        )   ,
-            mergeMap(([action, _]) =>
+                this.store.select(loginSelectors.selectLoginResponse)
+            ),
+            mergeMap(([action]) =>
                 this.dataService.createConversation(action.companion).pipe(
                     map((data) => {
                         const item: ConversationListItem = {
                             id: data.conversationID || "",
                             companionID: action.companion.companion || "",
                         };
-                        console.log("createPeopleEffect, success:", data, item);
-                        return peopleActions.createConversationSuccess({ item });
+                        return peopleActions.createConversationSuccess({
+                            item,
+                        });
                     }),
                     catchError((error) =>
                         of(peopleActions.createConversationFailure({ error }))
@@ -104,27 +122,43 @@ export class PeopleEffects {
         );
     });
 
-    startCounter$ = createEffect(() => this.actions$.pipe(
-        ofType(peopleActions.setStartCounter),
-        switchMap(({ value }) => {
-            if (value) {
-                return interval(1000).pipe(
-                    takeUntil(this.actions$.pipe(ofType(peopleActions.setStartCounter))),
-                    withLatestFrom(this.store.select(selectNextPeopleUpdateTime)),
-                    tap(([_, nextPeopleUpdateTime]) => {
-                        if (nextPeopleUpdateTime && nextPeopleUpdateTime > 0) {
-                            this.store.dispatch(peopleActions.decrementNextPeopleUpdateTime());
-                        } else {
-                            this.store.dispatch(peopleActions.setStartCounter({ value: false }));
-                        }
-                    }),
-                    map(() => peopleActions.noop())
-                );
-            } else {
+    startCounter$ = createEffect(() => {
+        return this.actions$.pipe(
+            ofType(peopleActions.setStartCounter),
+            switchMap(({ value }) => {
+                if (value) {
+                    return interval(1000).pipe(
+                        takeUntil(
+                            this.actions$.pipe(
+                                ofType(peopleActions.setStartCounter)
+                            )
+                        ),
+                        withLatestFrom(
+                            this.store.select(selectNextPeopleUpdateTime)
+                        ),
+                        tap(([_, nextPeopleUpdateTime]) => {
+                            if (
+                                nextPeopleUpdateTime &&
+                                nextPeopleUpdateTime > 0
+                            ) {
+                                this.store.dispatch(
+                                    peopleActions.decrementNextPeopleUpdateTime()
+                                );
+                            } else {
+                                this.store.dispatch(
+                                    peopleActions.setStartCounter({
+                                        value: false,
+                                    })
+                                );
+                            }
+                        }),
+                        map(() => peopleActions.noop())
+                    );
+                }
                 return of(peopleActions.noop());
-            }
-        })
-    ));
+            })
+        );
+    });
 
     constructor(
         private store: Store,

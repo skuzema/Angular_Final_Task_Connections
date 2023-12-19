@@ -99,7 +99,6 @@ export class LoginPageComponent {
 
         this.loginResponse$.subscribe((data) => {
             if (data) {
-                console.log("loginResponse$, data", data);
                 this.isLoading = false;
                 this.snackBar.showSnackbar(
                     "Login successful",
@@ -111,7 +110,6 @@ export class LoginPageComponent {
 
         this.loginError$.pipe(skip(1), take(1)).subscribe((error) => {
             if (error) {
-                console.log("loginError$, data", error);
                 this.isLoading = false;
                 if (
                     error.status === 400 &&

@@ -12,12 +12,6 @@ export class SortByDatePipe implements PipeTransform {
             return null;
         }
 
-        // const sortedItems = [...groups.Items].sort((a, b) => {
-        //     const dateA = new Date(a.createdAt).getTime();
-        //     const dateB = new Date(b.createdAt).getTime();
-        //     return dateB - dateA;
-        // });
-
         const sortedItems = [...groups.Items].sort((a, b) => {
             const dateA = a.createdAt;
             const dateB = b.createdAt;

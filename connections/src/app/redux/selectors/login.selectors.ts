@@ -1,4 +1,3 @@
-// login.selectors.ts
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 
 import { LoginState } from "../reducers/login.reducer";

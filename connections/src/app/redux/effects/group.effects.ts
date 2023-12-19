@@ -2,12 +2,25 @@ import { Injectable } from "@angular/core";
 import { Actions, concatLatestFrom, createEffect, ofType } from "@ngrx/effects";
 import { Store } from "@ngrx/store";
 import { interval, of } from "rxjs";
-import { catchError, exhaustMap, filter, map, mergeMap, switchMap, takeUntil, tap, withLatestFrom } from "rxjs/operators";
+import {
+    catchError,
+    exhaustMap,
+    filter,
+    map,
+    mergeMap,
+    switchMap,
+    takeUntil,
+    tap,
+    withLatestFrom,
+} from "rxjs/operators";
 
 import { DataService } from "../../core/services/data.service";
 import { GroupListItem } from "../../shared/models/data";
 import * as groupActions from "../actions/group.actions";
-import { selectGroups, selectNextGroupUpdateTime, selectStartCounterValue } from "../selectors/group.selectors";
+import {
+    selectGroups,
+    selectNextGroupUpdateTime,
+} from "../selectors/group.selectors";
 import * as loginSelectors from "../selectors/login.selectors";
 
 @Injectable()
@@ -45,7 +58,6 @@ export class GroupEffects {
                             createdAt: Date.now().toString(),
                             createdBy: loginResponse?.uid || "",
                         };
-                        console.log("createGroupEffect, success:", data, item);
                         return groupActions.createGroupSuccess({ item });
                     }),
                     catchError((error) =>
@@ -86,27 +98,43 @@ export class GroupEffects {
         );
     });
 
-    startCounter$ = createEffect(() => this.actions$.pipe(
-        ofType(groupActions.setStartCounter),
-        switchMap(({ value }) => {
-            if (value) {
-                return interval(1000).pipe(
-                    takeUntil(this.actions$.pipe(ofType(groupActions.setStartCounter))),
-                    withLatestFrom(this.store.select(selectNextGroupUpdateTime)),
-                    tap(([_, nextGroupUpdateTime]) => {
-                        if (nextGroupUpdateTime && nextGroupUpdateTime > 0) {
-                            this.store.dispatch(groupActions.decrementNextGroupUpdateTime());
-                        } else {
-                            this.store.dispatch(groupActions.setStartCounter({ value: false }));
-                        }
-                    }),
-                    map(() => groupActions.noop())
-                );
-            } else {
+    startCounter$ = createEffect(() => {
+        return this.actions$.pipe(
+            ofType(groupActions.setStartCounter),
+            switchMap(({ value }) => {
+                if (value) {
+                    return interval(1000).pipe(
+                        takeUntil(
+                            this.actions$.pipe(
+                                ofType(groupActions.setStartCounter)
+                            )
+                        ),
+                        withLatestFrom(
+                            this.store.select(selectNextGroupUpdateTime)
+                        ),
+                        tap(([_, nextGroupUpdateTime]) => {
+                            if (
+                                nextGroupUpdateTime &&
+                                nextGroupUpdateTime > 0
+                            ) {
+                                this.store.dispatch(
+                                    groupActions.decrementNextGroupUpdateTime()
+                                );
+                            } else {
+                                this.store.dispatch(
+                                    groupActions.setStartCounter({
+                                        value: false,
+                                    })
+                                );
+                            }
+                        }),
+                        map(() => groupActions.noop())
+                    );
+                }
                 return of(groupActions.noop());
-            }
-        })
-    ));
+            })
+        );
+    });
 
     constructor(
         private store: Store,

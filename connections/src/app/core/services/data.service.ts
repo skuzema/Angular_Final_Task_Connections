@@ -50,7 +50,6 @@ export class DataService {
         return this.http.post<LoginResponseData>(url, data).pipe(
             tap(
                 (response) => {
-                    console.log("login service success:", response);
                     const castedResponse: Response = {
                         type: "",
                         message: "",
@@ -65,7 +64,6 @@ export class DataService {
                     this.response.next(castedResponse);
                 },
                 (error) => {
-                    console.log("login service error:", error);
                     const castedError: Response = error;
                     this.response.next(castedError);
                 }
@@ -105,12 +103,10 @@ export class DataService {
         return this.http.delete<Response>(url).pipe(
             tap(
                 (response) => {
-                    console.log("service logout, success:", response);
                     this.lsService.clearUserData();
                     this.response.next(response);
                 },
                 (error) => {
-                    console.log("service logout, error:", error);
                     this.response.next(error);
                 }
             )
@@ -151,11 +147,9 @@ export class DataService {
         return this.http.post<GroupID>(url, nameObj).pipe(
             tap(
                 (response: any) => {
-                    console.log("createGroup, success:", response);
                     this.response.next(response);
                 },
                 (error: Response) => {
-                    console.log("createGroup, error:", error);
                     this.response.next(error);
                 }
             )
@@ -211,7 +205,9 @@ export class DataService {
         );
     }
 
-    private transformConversationsResponse(response: any): ConversationListData {
+    private transformConversationsResponse(
+        response: any
+    ): ConversationListData {
         const transformedData: ConversationListData = {
             Count: response.Count ? +response.Count : 0,
             Items: (response.Items || []).map((item: any) => ({
@@ -229,11 +225,9 @@ export class DataService {
         return this.http.post<ConversationID>(url, companion).pipe(
             tap(
                 (response: any) => {
-                    console.log("createConversation, success:", response);
                     this.response.next(response);
                 },
                 (error: Response) => {
-                    console.log("createConversation, error:", error);
                     this.response.next(error);
                 }
             )

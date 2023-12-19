@@ -1,3 +1,4 @@
+/* eslint-disable @ngrx/avoid-dispatching-multiple-actions-sequentially */
 import { CommonModule } from "@angular/common";
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
@@ -6,19 +7,19 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatListModule } from "@angular/material/list";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { Store } from "@ngrx/store";
-import {
-    Observable,
-    skip,
-    take,
-} from "rxjs";
+import { Observable, skip, take } from "rxjs";
 
 import { SnackbarComponent } from "../../../../core/components/snackbar/snackbar.component";
 import * as peopleActions from "../../../../redux/actions/people.actions";
-import * as peopleSelectors from "../../../../redux/selectors/people.selectors";
 import * as loginSelectors from "../../../../redux/selectors/login.selectors";
-import { ConversationListData, PeopleWithConversation, SnackType } from "../../../../shared/models/data";
-import { SortByDatePipe } from "../../../../shared/pipes/sort-by-date.pipe";
+import * as peopleSelectors from "../../../../redux/selectors/people.selectors";
 import { HighlightConversationIdDirective } from "../../../../shared/directives/highlight-conversation-id.directive";
+import {
+    ConversationListData,
+    PeopleWithConversation,
+    SnackType,
+} from "../../../../shared/models/data";
+import { SortByDatePipe } from "../../../../shared/pipes/sort-by-date.pipe";
 
 @Component({
     selector: "app-people-list",
@@ -30,7 +31,7 @@ import { HighlightConversationIdDirective } from "../../../../shared/directives/
         MatListModule,
         MatIconModule,
         SortByDatePipe,
-        HighlightConversationIdDirective
+        HighlightConversationIdDirective,
     ],
     providers: [SnackbarComponent],
     templateUrl: "./people-list.component.html",
@@ -49,8 +50,9 @@ export class PeopleListComponent implements OnInit, OnDestroy {
         public dialog: MatDialog,
         public snackBar: SnackbarComponent
     ) {
-        // this.peoples$ = store.select(peopleSelectors.selectPeoples);
-        this.peoples$ = store.select(peopleSelectors.selectPeopleWithConversation);
+        this.peoples$ = store.select(
+            peopleSelectors.selectPeopleWithConversation
+        );
         this.conversations$ = store.select(peopleSelectors.selectConversations);
         this.loading$ = store.select(peopleSelectors.selectLoading);
         this.error$ = store.select(peopleSelectors.selectError);
@@ -60,18 +62,15 @@ export class PeopleListComponent implements OnInit, OnDestroy {
         );
     }
 
-
     ngOnDestroy(): void {
-        console.log("People List, ngOnDestroy");
         this.store.dispatch(peopleActions.setStartCounter({ value: false }));
     }
 
     ngOnInit() {
-        console.log("People List, ngOnInit");
         this.nextPeopleUpdateTime$ = this.store.select(
             peopleSelectors.selectNextPeopleUpdateTime
         );
-        this.store.dispatch(peopleActions.setStartCounter({value: true}));
+        this.store.dispatch(peopleActions.setStartCounter({ value: true }));
         this.store.dispatch(peopleActions.loadPeoples());
         this.store.dispatch(peopleActions.loadConversations());
         this.error$
@@ -89,37 +88,41 @@ export class PeopleListComponent implements OnInit, OnDestroy {
         this.peoples$.pipe(take(1)).subscribe((peoples) => {
             if (peoples) {
                 this.store.dispatch(peopleActions.setNextPeopleUpdateTime());
-                this.store.dispatch(peopleActions.setStartCounter({ value: true }));
+                this.store.dispatch(
+                    peopleActions.setStartCounter({ value: true })
+                );
             }
         });
     }
 
-    onPeopleClick(event: Event,  conversationId: string | undefined, uid: string | undefined): void {
-        console.log("onPeopleClick, uid", uid, conversationId);
+    onPeopleClick(
+        event: Event,
+        conversationId: string | undefined,
+        uid: string | undefined
+    ): void {
         if (!conversationId) {
-           const companion = { companion: uid };
-           this.store.dispatch(
-                    peopleActions.createConversation({ companion })
-                );
+            const companion = { companion: uid };
+            this.store.dispatch(
+                peopleActions.createConversation({ companion })
+            );
 
-                this.error$
-                    .pipe(take(1))
-                    .subscribe((error) => this.showErrorMessage(error));
+            this.error$
+                .pipe(take(1))
+                .subscribe((error) => this.showErrorMessage(error));
 
-                this.conversations$.pipe(take(1)).subscribe((conversations) => {
-                    if (conversations) {
-                        this.snackBar.showSnackbar(
-                            "Conversation created successfully!",
-                            SnackType.success
-                        );
-                    }
-                });
+            this.conversations$.pipe(take(1)).subscribe((conversations) => {
+                if (conversations) {
+                    this.snackBar.showSnackbar(
+                        "Conversation created successfully!",
+                        SnackType.success
+                    );
+                }
+            });
         }
     }
 
     showErrorMessage(error: any) {
         if (error) {
-            console.log("Load People, error$", error);
             if (
                 error.status === 400 &&
                 error.error.type === "NotFoundException"

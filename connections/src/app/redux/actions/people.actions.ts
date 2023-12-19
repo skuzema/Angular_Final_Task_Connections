@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import { createAction, props } from "@ngrx/store";
 
-import { CompanionName, ConversationListData, ConversationListItem, PeopleListData, PeopleListItem } from "../../shared/models/data";
+import { CompanionName, ConversationListData, ConversationListItem, PeopleListData } from "../../shared/models/data";
 
 export const loadPeoples = createAction("[People] Load Peoples");
 

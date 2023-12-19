@@ -224,19 +224,14 @@ export class ProfilePageComponent implements OnInit {
 
         this.profileError$
             .pipe(
-                // skip(1),
                 take(1),
                 catchError(() => of(null))
             )
             .subscribe((error) => {
-                console.log("onLogoutClick 2,  subscribe, error:", error);
                 if (error) {
-                    console.log("onLogoutClick, error", error);
-                    console.log("error.error.message", error.error.message);
                     const errMsg = error.error.message || "Logout error!";
                     this.snackBar.showSnackbar(errMsg, SnackType.error);
                 } else {
-                    console.log("onLogoutClick 3, success");
                     this.router.navigate(["/signin"]);
                     this.snackBar.showSnackbar(
                         "Logout successful",
