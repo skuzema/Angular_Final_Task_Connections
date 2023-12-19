@@ -7,16 +7,9 @@ import { MatListModule } from "@angular/material/list";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { Store } from "@ngrx/store";
 import {
-    distinctUntilChanged,
-    interval,
-    map,
     Observable,
     skip,
-    Subscription,
     take,
-    takeUntil,
-    takeWhile,
-    timer,
 } from "rxjs";
 
 import { SnackbarComponent } from "../../../../core/components/snackbar/snackbar.component";
@@ -52,13 +45,7 @@ export class GroupListComponent implements OnInit, OnDestroy {
     currentUserUID$: Observable<string | undefined>;
     nextGroupUpdateTime$: Observable<number | null>;
 
-    updateCountdown: number | null = null;
-    isUpdateDisabled = false;
     groupName: string;
-
-    timer$!: Observable<number>;
-
-    private timerSubscription: Subscription | undefined;
 
     constructor(
         private store: Store,
@@ -75,28 +62,18 @@ export class GroupListComponent implements OnInit, OnDestroy {
         this.groupName = "";
     }
 
-    startTimer() {
-        this.timer$ = timer(0, 1000).pipe(takeUntil(this.nextGroupUpdateTime$));
-    }
 
     ngOnDestroy(): void {
         console.log("Group List, ngOnDestroy");
-        if (this.timerSubscription) {
-            this.timerSubscription.unsubscribe();
-        }
+        this.store.dispatch(groupActions.setStartCounter({ value: false }));
     }
 
     ngOnInit() {
         console.log("Group List, ngOnInit");
-        this.nextGroupUpdateTime$.pipe(take(1)).subscribe((count) => {
-            this.isUpdateDisabled = !!count;
-            console.log(
-                "counter, count, this.isUpdateDisabled:",
-                count,
-                this.isUpdateDisabled
-            );
-        });
-
+        this.nextGroupUpdateTime$ = this.store.select(
+            groupSelectors.selectNextGroupUpdateTime
+        );
+        this.store.dispatch(groupActions.setStartCounter({value: true}));
         this.store.dispatch(groupActions.loadGroups());
         this.error$
             .pipe(skip(1), take(1))
@@ -112,30 +89,7 @@ export class GroupListComponent implements OnInit, OnDestroy {
         this.groups$.pipe(take(1)).subscribe((groups) => {
             if (groups) {
                 this.store.dispatch(groupActions.setNextGroupUpdateTime());
-
-                if (this.timerSubscription) {
-                    this.timerSubscription.unsubscribe();
-                }
-
-                this.timerSubscription = interval(1000)
-                    .pipe(
-                        takeWhile(() => this.updateCountdown !== 0),
-                        map(() =>
-                            this.updateCountdown ? this.updateCountdown - 1 : 0
-                        ),
-                        distinctUntilChanged()
-                    )
-                    .subscribe((countdown) => {
-                        this.updateCountdown = countdown;
-                        this.isUpdateDisabled = true;
-
-                        if (this.updateCountdown === 0) {
-                            this.isUpdateDisabled = false;
-                            this.store.dispatch(
-                                groupActions.decrementNextGroupUpdateTime()
-                            );
-                        }
-                    });
+                this.store.dispatch(groupActions.setStartCounter({ value: true }));
             }
         });
     }

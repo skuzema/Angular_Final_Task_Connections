@@ -20,3 +20,7 @@ export const selectNextGroupUpdateTime = createSelector(
     selectGroupState,
     (state) => state.nextGroupUpdateTime
 );
+export const selectStartCounterValue = createSelector(
+    selectGroupState,
+    (state) => state.startCounter
+  );

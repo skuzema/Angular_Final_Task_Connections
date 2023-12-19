@@ -9,6 +9,7 @@ export interface GroupState {
     loading: boolean;
     error: any;
     nextGroupUpdateTime: number | null;
+    startCounter: boolean;
 }
 
 export const initialState: GroupState = {
@@ -16,6 +17,7 @@ export const initialState: GroupState = {
     loading: false,
     error: null,
     nextGroupUpdateTime: null,
+    startCounter: false
 };
 
 export const groupReducer = createReducer(
@@ -106,5 +108,9 @@ export const groupReducer = createReducer(
         nextGroupUpdateTime: state.nextGroupUpdateTime
             ? state.nextGroupUpdateTime - 1
             : 0,
+    })),
+    on(GroupActions.setStartCounter, (state, { value }) => ({
+        ...state,
+        startCounter: value,
     }))
 );

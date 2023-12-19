@@ -64,3 +64,12 @@ export const setNextGroupUpdateTime = createAction(
 export const decrementNextGroupUpdateTime = createAction(
     "[Group] Decrement Next Group Update Time"
 );
+
+export const setStartCounter = createAction(
+    "[Group] Set Start Counter Value",
+    props<{ value: boolean }>()
+);
+
+export const noop = createAction(
+    "[Group] No Operation"
+);

@@ -3,11 +3,11 @@
         <h2>Group list</h2>
     </div>
     <div class="group-buttons">
-        <div class="group-countdown" *ngIf="isUpdateDisabled !== false">
-            <span>Next update after: {{ updateCountdown }} seconds</span>
+        <div class="group-countdown" *ngIf="!(nextGroupUpdateTime$ | async) === false">
+            <span><strong>Next update after: {{ (nextGroupUpdateTime$ | async) }} seconds</strong></span>
         </div>
         <div class="group-operations">
-            <button mat-flat-button color="warn" [disabled]="isUpdateDisabled" (click)="onUpdateGroup()">
+            <button mat-flat-button color="warn" [disabled]="!(nextGroupUpdateTime$ | async) === false" (click)="onUpdateGroup()">
                 Update
             </button>
             <button mat-flat-button color="primary" (click)="openNewGroupDialog()">Create Group</button>
