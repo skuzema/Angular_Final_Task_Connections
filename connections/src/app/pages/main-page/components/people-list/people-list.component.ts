@@ -16,8 +16,9 @@ import { SnackbarComponent } from "../../../../core/components/snackbar/snackbar
 import * as peopleActions from "../../../../redux/actions/people.actions";
 import * as peopleSelectors from "../../../../redux/selectors/people.selectors";
 import * as loginSelectors from "../../../../redux/selectors/login.selectors";
-import { PeopleListData, SnackType } from "../../../../shared/models/data";
+import { ConversationListData, PeopleWithConversation, SnackType } from "../../../../shared/models/data";
 import { SortByDatePipe } from "../../../../shared/pipes/sort-by-date.pipe";
+import { HighlightConversationIdDirective } from "../../../../shared/directives/highlight-conversation-id.directive";
 
 @Component({
     selector: "app-people-list",
@@ -29,13 +30,15 @@ import { SortByDatePipe } from "../../../../shared/pipes/sort-by-date.pipe";
         MatListModule,
         MatIconModule,
         SortByDatePipe,
+        HighlightConversationIdDirective
     ],
     providers: [SnackbarComponent],
     templateUrl: "./people-list.component.html",
     styleUrl: "./people-list.component.scss",
 })
 export class PeopleListComponent implements OnInit, OnDestroy {
-    peoples$: Observable<PeopleListData>;
+    peoples$: Observable<PeopleWithConversation[]>;
+    conversations$: Observable<ConversationListData>;
     loading$: Observable<boolean>;
     error$: Observable<any>;
     currentUserUID$: Observable<string | undefined>;
@@ -46,7 +49,9 @@ export class PeopleListComponent implements OnInit, OnDestroy {
         public dialog: MatDialog,
         public snackBar: SnackbarComponent
     ) {
-        this.peoples$ = store.select(peopleSelectors.selectPeoples);
+        // this.peoples$ = store.select(peopleSelectors.selectPeoples);
+        this.peoples$ = store.select(peopleSelectors.selectPeopleWithConversation);
+        this.conversations$ = store.select(peopleSelectors.selectConversations);
         this.loading$ = store.select(peopleSelectors.selectLoading);
         this.error$ = store.select(peopleSelectors.selectError);
         this.currentUserUID$ = store.select(loginSelectors.selectUid);
@@ -89,32 +94,27 @@ export class PeopleListComponent implements OnInit, OnDestroy {
         });
     }
 
-    openNewPeopleDialog(): void {
-        // const dialogRef = this.dialog.open(NewPeopleComponent, {
-        //     data: { peopleName: this.peopleName },
-        // });
+    onPeopleClick(event: Event,  conversationId: string | undefined, uid: string | undefined): void {
+        console.log("onPeopleClick, uid", uid, conversationId);
+        if (!conversationId) {
+           const companion = { companion: uid };
+           this.store.dispatch(
+                    peopleActions.createConversation({ companion })
+                );
 
-        // dialogRef.afterClosed().subscribe((result) => {
-        //     if (result) {
-        //         this.peopleName = result;
-        //         this.store.dispatch(
-        //             peopleActions.createPeople({ name: this.peopleName })
-        //         );
+                this.error$
+                    .pipe(take(1))
+                    .subscribe((error) => this.showErrorMessage(error));
 
-        //         this.error$
-        //             .pipe(take(1))
-        //             .subscribe((error) => this.showErrorMessage(error));
-
-        //         this.peoples$.pipe(take(1)).subscribe((people) => {
-        //             if (people) {
-        //                 this.snackBar.showSnackbar(
-        //                     "People created successfully!",
-        //                     SnackType.success
-        //                 );
-        //             }
-        //         });
-        //     }
-        // });
+                this.conversations$.pipe(take(1)).subscribe((conversations) => {
+                    if (conversations) {
+                        this.snackBar.showSnackbar(
+                            "Conversation created successfully!",
+                            SnackType.success
+                        );
+                    }
+                });
+        }
     }
 
     showErrorMessage(error: any) {

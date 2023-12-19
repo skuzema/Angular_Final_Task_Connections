@@ -16,8 +16,8 @@
 <div class="people-list" *ngIf="(peoples$ | async) as peoples; else loading">
     <mat-nav-list>
         <div class="people-item">
-            @for (people of peoples.Items; track people.uid) {
-                <a mat-list-item >
+            @for (people of peoples; track people.uid) {
+                <a mat-list-item highlight-conversation-id (click)="onPeopleClick($event, people.conversationId, people.uid)">
                     <div matListItemTitle>{{ people.name }}</div>
                 </a>
             }

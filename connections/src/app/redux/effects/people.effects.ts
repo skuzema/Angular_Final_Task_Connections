@@ -5,7 +5,7 @@ import { interval, of } from "rxjs";
 import { catchError, exhaustMap, filter, map, mergeMap, switchMap, takeUntil, tap, withLatestFrom } from "rxjs/operators";
 
 import { DataService } from "../../core/services/data.service";
-import { PeopleListItem } from "../../shared/models/data";
+import { ConversationListItem, PeopleListItem } from "../../shared/models/data";
 import * as peopleActions from "../actions/people.actions";
 import { selectPeoples, selectNextPeopleUpdateTime, selectStartCounterValue } from "../selectors/people.selectors";
 import * as loginSelectors from "../selectors/login.selectors";
@@ -80,31 +80,29 @@ export class PeopleEffects {
         );
     });
 
-    // createPeople$ = createEffect(() => {
-    //     return this.actions$.pipe(
-    //         ofType(PeopleActions.createPeople),
-    //         concatLatestFrom(() =>
-    //             this.store.select(loginSelectors.selectLoginResponse)
-    //         ),
-    //         mergeMap(([action, loginResponse]) =>
-    //             this.dataService.createPeople(action.name).pipe(
-    //                 map((data) => {
-    //                     const item: PeopleListItem = {
-    //                         id: data.PeopleID || "",
-    //                         name: action.name,
-    //                         createdAt: Date.now().toString(),
-    //                         createdBy: loginResponse?.uid || "",
-    //                     };
-    //                     console.log("createPeopleEffect, success:", data, item);
-    //                     return PeopleActions.createPeopleSuccess({ item });
-    //                 }),
-    //                 catchError((error) =>
-    //                     of(PeopleActions.createPeopleFailure({ error }))
-    //                 )
-    //             )
-    //         )
-    //     );
-    // });
+    createConversation$ = createEffect(() => {
+        return this.actions$.pipe(
+            ofType(peopleActions.createConversation),
+            concatLatestFrom(() =>
+            this.store.select(loginSelectors.selectLoginResponse)
+        )   ,
+            mergeMap(([action, _]) =>
+                this.dataService.createConversation(action.companion).pipe(
+                    map((data) => {
+                        const item: ConversationListItem = {
+                            id: data.conversationID || "",
+                            companionID: action.companion.companion || "",
+                        };
+                        console.log("createPeopleEffect, success:", data, item);
+                        return peopleActions.createConversationSuccess({ item });
+                    }),
+                    catchError((error) =>
+                        of(peopleActions.createConversationFailure({ error }))
+                    )
+                )
+            )
+        );
+    });
 
     startCounter$ = createEffect(() => this.actions$.pipe(
         ofType(peopleActions.setStartCounter),

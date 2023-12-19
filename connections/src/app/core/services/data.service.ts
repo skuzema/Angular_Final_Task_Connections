@@ -3,6 +3,8 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, catchError, map, Observable, tap } from "rxjs";
 
 import {
+    CompanionName,
+    ConversationID,
     ConversationListData,
     ConversationListItem,
     GroupID,
@@ -219,5 +221,22 @@ export class DataService {
         };
 
         return transformedData;
+    }
+
+    createConversation(companion: CompanionName): Observable<ConversationID> {
+        const url = `${this.apiUrl}/conversations/create`;
+
+        return this.http.post<ConversationID>(url, companion).pipe(
+            tap(
+                (response: any) => {
+                    console.log("createConversation, success:", response);
+                    this.response.next(response);
+                },
+                (error: Response) => {
+                    console.log("createConversation, error:", error);
+                    this.response.next(error);
+                }
+            )
+        );
     }
 }

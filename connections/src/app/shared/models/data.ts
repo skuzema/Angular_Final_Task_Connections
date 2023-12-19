@@ -68,7 +68,7 @@ export interface ConversationListItem {
 }
 
 export interface CompanionName {
-    companion: string;
+    companion?: string;
 }
 
 export interface ConversationID {
@@ -79,4 +79,10 @@ export interface CredentialsData {
     uid: string | undefined;
     email: string | undefined;
     token: string | undefined;
+}
+
+export interface PeopleWithConversation {
+    name?: string;
+    uid?: string;
+    conversationId?: string;
 }

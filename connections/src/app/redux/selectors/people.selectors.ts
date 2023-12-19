@@ -1,6 +1,7 @@
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 
 import { PeopleState } from "../reducers/people.reducer";
+import { ConversationListItem, PeopleListItem, PeopleWithConversation } from "../../shared/models/data";
 
 const selectPeopleState = createFeatureSelector<PeopleState>("peoples");
 
@@ -27,4 +28,28 @@ export const selectNextPeopleUpdateTime = createSelector(
 export const selectStartCounterValue = createSelector(
     selectPeopleState,
     (state) => state.startCounter
-  );
+);
+
+export const selectPeopleWithConversation = createSelector(
+  selectPeopleState,
+  (state: PeopleState) => {
+    const peopleWithConversation: PeopleWithConversation[] = [];
+
+    const peoples = state?.peoples?.Items;
+    if (peoples) {
+      for (const person of peoples) {
+        const conversationId = state?.conversations?.Items?.find(
+          conversation => conversation.companionID === person.uid
+        )?.id;
+
+        peopleWithConversation.push({
+          name: person.name,
+          uid: person.uid,
+          conversationId,
+        });
+      }
+    }
+
+    return peopleWithConversation;
+  },
+);
