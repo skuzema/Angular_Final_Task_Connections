@@ -17,7 +17,7 @@
     <mat-nav-list>
         <div class="people-item">
             @for (people of peoples; track people.uid) {
-                <a mat-list-item highlight-conversation-id (click)="onPeopleClick($event, people.conversationId, people.uid)">
+                <a mat-list-item [highlightConv]="people.conversationId" (click)="onPeopleClick($event, people.conversationId, people.uid)">
                     <div matListItemTitle>{{ people.name }}</div>
                 </a>
             }
