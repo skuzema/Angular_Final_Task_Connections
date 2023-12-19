@@ -22,7 +22,7 @@ export class HighlightConversationIdDirective {
             if (!this.highlightConv) {
                 return;
             }
-            this.el.nativeElement.style.backgroundColor = "#f0f0f0";
+            this.el.nativeElement.style.backgroundColor = "#db8e8e";
         }
     }
 }

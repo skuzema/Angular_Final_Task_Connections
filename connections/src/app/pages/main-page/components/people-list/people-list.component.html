@@ -3,11 +3,11 @@
         <h2>People list</h2>
     </div>
     <div class="people-buttons">
-        <div class="people-countdown" *ngIf="!(nextPeopleUpdateTime$ | async) === false">
+        <div class="people-countdown" *ngIf="!!(nextPeopleUpdateTime$ | async) === true">
             <span><strong>Next update after: {{ (nextPeopleUpdateTime$ | async) }} seconds</strong></span>
         </div>
         <div class="people-operations">
-            <button mat-flat-button color="warn" [disabled]="!(nextPeopleUpdateTime$ | async) === false" (click)="onUpdatePeople()">
+            <button mat-flat-button color="warn" [disabled]="!!(nextPeopleUpdateTime$ | async) === true" (click)="onUpdatePeople()">
                 Update
             </button>
         </div>

@@ -6,6 +6,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatIconModule } from "@angular/material/icon";
 import { MatListModule } from "@angular/material/list";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { Observable, skip, take } from "rxjs";
 
@@ -40,6 +41,13 @@ import { SortByDatePipe } from "../../../../shared/pipes/sort-by-date.pipe";
 export class PeopleListComponent implements OnInit, OnDestroy {
     peoples$: Observable<PeopleWithConversation[]>;
     conversations$: Observable<ConversationListData>;
+    lastConversations$: Observable<
+        | {
+              id?: string;
+              companionID?: string;
+          }
+        | undefined
+    >;
     loading$: Observable<boolean>;
     error$: Observable<any>;
     currentUserUID$: Observable<string | undefined>;
@@ -48,12 +56,16 @@ export class PeopleListComponent implements OnInit, OnDestroy {
     constructor(
         private store: Store,
         public dialog: MatDialog,
-        public snackBar: SnackbarComponent
+        public snackBar: SnackbarComponent,
+        private router: Router
     ) {
         this.peoples$ = store.select(
             peopleSelectors.selectPeopleWithConversation
         );
         this.conversations$ = store.select(peopleSelectors.selectConversations);
+        this.lastConversations$ = store.select(
+            peopleSelectors.selectLastConversation
+        );
         this.loading$ = store.select(peopleSelectors.selectLoading);
         this.error$ = store.select(peopleSelectors.selectError);
         this.currentUserUID$ = store.select(loginSelectors.selectUid);
@@ -106,18 +118,20 @@ export class PeopleListComponent implements OnInit, OnDestroy {
                 peopleActions.createConversation({ companion })
             );
 
-            this.error$
-                .pipe(take(1))
-                .subscribe((error) => this.showErrorMessage(error));
-
-            this.conversations$.pipe(take(1)).subscribe((conversations) => {
+            this.lastConversations$.pipe(take(1)).subscribe((conversations) => {
                 if (conversations) {
+                    const latestConversationId = conversations.id;
+                    this.router.navigate([
+                        `/conversation/${latestConversationId}`,
+                    ]);
                     this.snackBar.showSnackbar(
                         "Conversation created successfully!",
                         SnackType.success
                     );
                 }
             });
+        } else {
+            this.router.navigate([`/conversation/${conversationId}`]);
         }
     }
 

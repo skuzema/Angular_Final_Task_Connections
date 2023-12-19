@@ -31,25 +31,45 @@ export const selectStartCounterValue = createSelector(
 );
 
 export const selectPeopleWithConversation = createSelector(
-  selectPeopleState,
-  (state: PeopleState) => {
-    const peopleWithConversation: PeopleWithConversation[] = [];
+    selectPeopleState,
+    (state: PeopleState) => {
+        const peopleWithConversation: PeopleWithConversation[] = [];
 
-    const peoples = state?.peoples?.Items;
-    if (peoples) {
-      for (const person of peoples) {
-        const conversationId = state?.conversations?.Items?.find(
-          (conversation) => conversation.companionID === person.uid
-        )?.id;
+        const peoples = state?.peoples?.Items;
+        if (peoples) {
+            for (const person of peoples) {
+                const conversationId = state?.conversations?.Items?.find(
+                    (conversation) => conversation.companionID === person.uid
+                )?.id;
 
-        peopleWithConversation.push({
-          name: person.name,
-          uid: person.uid,
-          conversationId,
-        });
-      }
+                peopleWithConversation.push({
+                    name: person.name,
+                    uid: person.uid,
+                    conversationId,
+                });
+            }
+        }
+
+        return peopleWithConversation;
     }
+);
 
-    return peopleWithConversation;
-  },
+export const selectLastConversation = createSelector(
+    selectConversations,
+    (conversations) => {
+        if (!conversations || !conversations.Items) {
+            return undefined;
+        }
+
+        const lastConversation =
+            conversations.Items[conversations.Items.length - 1];
+        if (!lastConversation) {
+            return undefined;
+        }
+
+        return {
+            id: lastConversation.id,
+            companionID: lastConversation.companionID,
+        };
+    }
 );
