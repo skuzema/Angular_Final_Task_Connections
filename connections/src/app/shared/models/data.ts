@@ -37,23 +37,42 @@ export interface GroupListData {
 }
 
 export interface GroupListItem {
-    id: string; // group id
-    name: string; // group name
-    createdAt: string; // unix timestamp when group was created
-    createdBy: string; // user id who created this group
+    id: string; 
+    name: string;
+    createdAt: string;
+    createdBy: string;
 }
 
 export interface GroupID {
     groupID: string;
 }
+
 export interface PeopleListData {
-    Count: number;
-    Items: PeopleListItem[];
+    Count?: number;
+    Items?: PeopleListItem[];
 }
 
 export interface PeopleListItem {
-    name: string; // user name
-    uid: string; // user id
+    name: string;
+    uid: string;
+}
+
+export interface ConversationListData {
+    Count?: number;
+    Items?: ConversationListItem[];
+}
+
+export interface ConversationListItem {
+    id?: string; 
+    companionID?: string;
+}
+
+export interface CompanionName {
+    companion: string;
+}
+
+export interface ConversationID {
+    conversationID: string;
 }
 
 export interface CredentialsData {

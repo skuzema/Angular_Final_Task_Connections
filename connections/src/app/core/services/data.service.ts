@@ -3,11 +3,15 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, catchError, map, Observable, tap } from "rxjs";
 
 import {
+    ConversationListData,
+    ConversationListItem,
     GroupID,
     GroupListData,
     GroupListItem,
     LoginData,
     LoginResponseData,
+    PeopleListData,
+    PeopleListItem,
     RegistrationData,
     Response,
     UserProfileData,
@@ -165,5 +169,55 @@ export class DataService {
                 (error: Response) => this.response.next(error)
             )
         );
+    }
+
+    getPeoples(): Observable<PeopleListData> {
+        const url = `${this.apiUrl}/users`;
+
+        return this.http.get<PeopleListData>(url).pipe(
+            map((response: PeopleListData) =>
+                this.transformPeoplesResponse(response)
+            ),
+            catchError((error) => {
+                throw error;
+            })
+        );
+    }
+
+    private transformPeoplesResponse(response: any): PeopleListData {
+        const transformedData: PeopleListData = {
+            Count: response.Count ? +response.Count : 0,
+            Items: (response.Items || []).map((item: any) => ({
+                name: item.name?.S || "",
+                uid: item.uid?.S || "",
+            })) as PeopleListItem[],
+        };
+
+        return transformedData;
+    }
+
+    getConversations(): Observable<ConversationListData> {
+        const url = `${this.apiUrl}/conversations/list`;
+
+        return this.http.get<ConversationListData>(url).pipe(
+            map((response: ConversationListData) =>
+                this.transformConversationsResponse(response)
+            ),
+            catchError((error) => {
+                throw error;
+            })
+        );
+    }
+
+    private transformConversationsResponse(response: any): ConversationListData {
+        const transformedData: ConversationListData = {
+            Count: response.Count ? +response.Count : 0,
+            Items: (response.Items || []).map((item: any) => ({
+                id: item.id?.S || "",
+                companionID: item.companionID?.S || "",
+            })) as ConversationListItem[],
+        };
+
+        return transformedData;
     }
 }

@@ -13,6 +13,6 @@ export class NotFoundPageComponent {
     constructor(private router: Router) {}
 
     onGoToMain(): void {
-        this.router.navigate(["/main"]);
+        this.router.navigate(["/"]);
     }
 }

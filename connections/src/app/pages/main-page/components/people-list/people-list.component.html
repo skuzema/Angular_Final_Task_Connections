@@ -1,1 +1,30 @@
-<p>people-list works!</p>
+<div class="people-header">
+    <div>
+        <h2>People list</h2>
+    </div>
+    <div class="people-buttons">
+        <div class="people-countdown" *ngIf="!(nextPeopleUpdateTime$ | async) === false">
+            <span><strong>Next update after: {{ (nextPeopleUpdateTime$ | async) }} seconds</strong></span>
+        </div>
+        <div class="people-operations">
+            <button mat-flat-button color="warn" [disabled]="!(nextPeopleUpdateTime$ | async) === false" (click)="onUpdatePeople()">
+                Update
+            </button>
+        </div>
+    </div>
+</div>
+<div class="people-list" *ngIf="(peoples$ | async) as peoples; else loading">
+    <mat-nav-list>
+        <div class="people-item">
+            @for (people of peoples.Items; track people.uid) {
+                <a mat-list-item >
+                    <div matListItemTitle>{{ people.name }}</div>
+                </a>
+            }
+        </div>
+    </mat-nav-list>
+</div>
+<ng-template #loading>
+    <mat-spinner></mat-spinner>
+</ng-template>
+
