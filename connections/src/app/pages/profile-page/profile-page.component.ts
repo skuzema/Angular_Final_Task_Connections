@@ -91,31 +91,23 @@ export class ProfilePageComponent implements OnInit {
 
     ngOnInit(): void {
         this.store.dispatch(profileActions.loadUserProfile());
-        this.loadProfileData();
-    }
 
-    private loadProfileData() {
+        this.profileError$
+            .pipe(skip(1), take(1))
+            .subscribe((error) => this.showErrorMessage(error));
+
         this.userProfile$
-            .pipe(
-                map((userProfile) => ({
+        .subscribe((userProfile) => {
+            if (userProfile) {
+                const newProfile = {
                     ...userProfile,
                     createdAt: userProfile?.createdAt
                         ? this.formatDate(userProfile.createdAt)
-                        : "",
-                })),
-                tap((userProfile) => {
-                    if (userProfile) {
-                        this.registrationForm.patchValue(userProfile);
-                    }
-                }),
-                catchError((error) => {
-                    const errMsg =
-                        error.error.message || "Error loading user profile!";
-                    this.snackBar.showSnackbar(errMsg, SnackType.error);
-                    return of(error);
-                })
-            )
-            .subscribe();
+                        : ""
+                };
+                this.registrationForm.patchValue(newProfile);
+            }
+        });
     }
 
     private formatDate(timestamp: string): string {
@@ -168,7 +160,23 @@ export class ProfilePageComponent implements OnInit {
 
     onCancelClick(): void {
         this.resetForm();
-        this.loadProfileData();
+        
+        this.profileError$
+            .pipe(skip(1), take(1))
+            .subscribe((error) => this.showErrorMessage(error));
+
+        this.userProfile$
+            .subscribe((userProfile) => {
+                if (userProfile) {
+                    const newProfile = {
+                        ...userProfile,
+                        createdAt: userProfile?.createdAt
+                            ? this.formatDate(userProfile.createdAt)
+                            : ""
+                    };
+                    this.registrationForm.patchValue(newProfile);
+                }
+            });
     }
 
     onSaveClick(): void {
@@ -241,5 +249,24 @@ export class ProfilePageComponent implements OnInit {
                     );
                 }
             });
+    }
+
+    showErrorMessage(error: any) {
+        if (error) {
+            if (
+                error.status === 400 &&
+                error.error.type === "NotFoundException"
+            ) {
+                this.snackBar.showSnackbar(
+                    error.error.message,
+                    SnackType.error
+                );
+            } else {
+                const msg = error.error.message
+                    ? error.error.message
+                    : "Network error";
+                this.snackBar.showSnackbar(msg, SnackType.error);
+            }
+        }
     }
 }
