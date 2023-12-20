@@ -58,4 +58,8 @@ export class HeaderComponent implements OnInit {
     onSetProfile(): void {
         this.router.navigate(["/profile"]);
     }
+
+    onMain(): void {
+        this.router.navigate(["/"]);
+    }
 }

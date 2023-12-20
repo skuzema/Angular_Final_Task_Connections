@@ -8,6 +8,7 @@ import { MatListModule } from "@angular/material/list";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { Store } from "@ngrx/store";
 import { Observable, skip, take } from "rxjs";
+import { Router } from "@angular/router";
 
 import { SnackbarComponent } from "../../../../core/components/snackbar/snackbar.component";
 import * as groupActions from "../../../../redux/actions/group.actions";
@@ -45,6 +46,7 @@ export class GroupListComponent implements OnInit, OnDestroy {
     groupName: string;
 
     constructor(
+        private router: Router,
         private store: Store,
         public dialog: MatDialog,
         public snackBar: SnackbarComponent
@@ -92,6 +94,7 @@ export class GroupListComponent implements OnInit, OnDestroy {
 
     onDeleteClick(event: Event, groupId: string) {
         event.preventDefault();
+        event.stopPropagation();
         const dialogRef = this.dialog.open(DeleteDialogComponent);
 
         dialogRef.afterClosed().subscribe((result) => {
@@ -140,6 +143,14 @@ export class GroupListComponent implements OnInit, OnDestroy {
                 });
             }
         });
+    }
+
+    onLinkClick(
+        event: Event,
+        groupId: string
+    ): void {
+        // event.stopPropagation();
+        this.router.navigate([`/group/${groupId}`]);
     }
 
     showErrorMessage(error: any) {

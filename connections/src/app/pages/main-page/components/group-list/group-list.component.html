@@ -18,7 +18,7 @@
     <mat-nav-list>
         <div class="group-item">
             @for (group of groups.Items; track group.id) {
-                <a mat-list-item href="/group/{{group.id}}" >
+                <a mat-list-item (click)="onLinkClick($event, group.id)">
                     <div matListItemTitle>{{ group.name }}</div>
                     <div matListItemLine>{{ group.createdAt | date:'short'}}</div>
                     <button mat-icon-button
