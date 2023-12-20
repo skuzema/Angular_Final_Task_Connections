@@ -26,6 +26,7 @@ import { loginReducer } from "./redux/reducers/login.reducer";
 import { peopleReducer } from "./redux/reducers/people.reducer";
 import { profileReducer } from "./redux/reducers/profile.reducer";
 import { AuthInterceptor } from "./shared/interceptors/auth.interceptor";
+import { metaReducers } from "./redux/reducers/meta.reducer";
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -42,7 +43,7 @@ export const appConfig: ApplicationConfig = {
             groups: groupReducer,
             peoples: peopleReducer,
             login: loginReducer,
-        }),
+        }, {metaReducers}),
         provideEffects([ProfileEffects, GroupEffects, LoginEffects, PeopleEffects]),
         provideRouterStore(),
         provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),

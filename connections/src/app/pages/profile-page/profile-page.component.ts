@@ -31,6 +31,7 @@ import {
 
 import { SnackbarComponent } from "../../core/components/snackbar/snackbar.component";
 import * as profileActions from "../../redux/actions/profile.actions";
+import * as metaActions from "../../redux/actions/meta.actions";
 import {
     selectProfileError,
     selectUserProfile,
@@ -232,6 +233,7 @@ export class ProfilePageComponent implements OnInit {
                     const errMsg = error.error.message || "Logout error!";
                     this.snackBar.showSnackbar(errMsg, SnackType.error);
                 } else {
+                    this.store.dispatch(metaActions.logoutAction());
                     this.router.navigate(["/signin"]);
                     this.snackBar.showSnackbar(
                         "Logout successful",
